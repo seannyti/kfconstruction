@@ -235,7 +235,10 @@ public partial class EmailSender : IEmailSender, IEmailService
                 return false;
             }
 
-            if (_emailSettings.DevelopmentMode)
+            // Allow DevelopmentMode override from admin settings
+            var developmentMode = await _settingsService.GetSettingAsync("Email.DevelopmentMode", _emailSettings.DevelopmentMode);
+
+            if (developmentMode)
             {
                 // Development mode - just log
                 _logger.LogInformation("=== EMAIL (Development Mode) ===");

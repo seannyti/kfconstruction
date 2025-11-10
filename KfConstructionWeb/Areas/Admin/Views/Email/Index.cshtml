@@ -1,0 +1,124 @@
+@model KfConstructionWeb.Models.ViewModels.EmailConfigViewModel
+
+@{
+    ViewData["Title"] = "Email Settings";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <nav aria-label="breadcrumb" class="mb-2">
+                        <ol class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Dashboard</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Email Settings</li>
+                        </ol>
+                    </nav>
+                    <h2>
+                        <i class="bi bi-envelope-fill me-2"></i>Email Settings
+                    </h2>
+                    <p class="text-muted">Configure SMTP and run a test send. Values here override appsettings.</p>
+                </div>
+                <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <partial name="_TempDataMessages" />
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="bi bi-gear-fill me-2"></i>SMTP Configuration</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Save" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">SMTP Host</label>
+                                <input class="form-control" asp-for="Host" placeholder="smtp.example.com" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Port</label>
+                                <input class="form-control" asp-for="Port" type="number" min="1" max="65535" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Use SSL/TLS</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" asp-for="UseSsl" />
+                                    <label class="form-check-label" for="UseSsl">Enable</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Username</label>
+                                <input class="form-control" asp-for="Username" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Password</label>
+                                <input class="form-control" asp-for="Password" type="password" placeholder="Leave blank to keep current" />
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" asp-for="EnableEmails" />
+                                    <label class="form-check-label" for="EnableEmails">Enable Emails</label>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="form-check">
+                                    <input class="form-check-input" asp-for="DevelopmentMode" />
+                                    <label class="form-check-label" for="DevelopmentMode">Development Mode (log only, no send)</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alert alert-info">
+                            <div><strong>Default Sender:</strong> @Model.DefaultSenderName &lt;@Model.DefaultSenderEmail&gt;</div>
+                            <small>Set in appsettings. For Yahoo or Gmail, ensure app password is configured and the from address matches the authenticated account.</small>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save me-1"></i>Save Settings
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="bi bi-send-check-fill me-2"></i>Send Test Email</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="TestSend" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="mb-3">
+                            <label class="form-label">Send to</label>
+                            <input class="form-control" asp-for="TestRecipient" type="email" placeholder="you@example.com" />
+                        </div>
+                        <button type="submit" class="btn btn-outline-primary w-100">
+                            <i class="bi bi-envelope-paper me-1"></i>Send Test
+                        </button>
+                    </form>
+                    <hr />
+                    <div class="small text-muted">
+                        Tips:
+                        <ul class="mb-0">
+                            <li>Yahoo/Gmail require an app password; regular account password won’t work.</li>
+                            <li>SPF/DKIM should include your SMTP host to avoid spam filtering.</li>
+                            <li>Port 587 with TLS is recommended.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

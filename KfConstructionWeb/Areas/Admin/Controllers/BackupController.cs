@@ -47,7 +47,13 @@ public class BackupController : Controller
         {
             _logger.LogError(ex, "Error loading backup page");
             TempData["Error"] = "An error occurred while loading backup information.";
-            return View(new BackupRestoreViewModel());
+            // Ensure view has safe defaults to avoid null references
+            return View(new BackupRestoreViewModel
+            {
+                AvailableBackups = new List<BackupInfo>(),
+                DatabaseSizeBytes = 0,
+                LastBackupDate = null
+            });
         }
     }
 

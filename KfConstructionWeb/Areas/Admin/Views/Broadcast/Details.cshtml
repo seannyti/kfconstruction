@@ -133,6 +133,23 @@
                                 <th>Sent At:</th>
                                 <td>@Model.SentAt.ToString("MMMM dd, yyyy 'at' hh:mm tt")</td>
                             </tr>
+                            <tr>
+                                <th>Status:</th>
+                                <td>
+                                    @if (isExpired)
+                                    {
+                                        <span class="badge bg-secondary">Expired</span>
+                                    }
+                                    else if (Model.IsActive)
+                                    {
+                                        <span class="badge bg-success">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-dark">Inactive</span>
+                                    }
+                                </td>
+                            </tr>
                             @if (Model.ExpiresAt.HasValue)
                             {
                                 <tr>
@@ -196,14 +213,14 @@
                     <div class="d-flex gap-2">
                         @if (Model.IsActive && !isExpired)
                         {
-                            <button type="button" class="btn btn-warning" 
+                            <button type="button" class="btn btn-outline-warning" 
                                     onclick="confirmDeactivate(@Model.Id, '@Model.Subject')">
-                                <i class="fas fa-pause me-2"></i>Deactivate Message
+                                <i class="bi bi-pause-fill me-2"></i>Deactivate
                             </button>
                         }
-                        <button type="button" class="btn btn-danger" 
+                        <button type="button" class="btn btn-outline-danger" 
                                 onclick="confirmDelete(@Model.Id, '@Model.Subject')">
-                            <i class="fas fa-trash me-2"></i>Delete Message
+                            <i class="bi bi-trash me-2"></i>Delete
                         </button>
                         <a asp-action="Index" class="btn btn-outline-secondary ms-auto">
                             <i class="bi bi-arrow-left me-2"></i>Back to List
@@ -227,17 +244,5 @@
 </form>
 
 @section Scripts {
-    <script>
-        function confirmDeactivate(id, subject) {
-            if (confirm('Are you sure you want to deactivate the broadcast message "' + subject + '"?\n\nUsers will no longer see this message.')) {
-                document.getElementById('deactivateForm').submit();
-            }
-        }
-
-        function confirmDelete(id, subject) {
-            if (confirm('Are you sure you want to delete the broadcast message "' + subject + '"?\n\nThis action cannot be undone.')) {
-                document.getElementById('deleteForm').submit();
-            }
-        }
-    </script>
+    <script src="~/js/admin.broadcast.js" asp-append-version="true"></script>
 }
