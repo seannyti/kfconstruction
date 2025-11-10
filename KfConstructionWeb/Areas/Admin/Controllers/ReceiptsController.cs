@@ -314,6 +314,9 @@ public class ReceiptsController : BaseAdminController
             _logger.LogWarning("=== RECEIPT DATA === Vendor: {Vendor}, Amount: {Amount}, Date: {Date}, Category: {Category}, Payment: {Payment}",
                 receipt.Vendor, receipt.TotalAmount, receipt.PurchaseDate, receipt.Category, receipt.PaymentMethod);
 
+            // Clear ModelState - we're validating the new receipt object, not the form model
+            ModelState.Clear();
+
             // Validate model
             if (!TryValidateModel(receipt))
             {
