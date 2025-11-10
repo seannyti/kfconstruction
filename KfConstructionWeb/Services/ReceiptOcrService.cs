@@ -118,6 +118,23 @@ public class ReceiptOcrService : IReceiptOcrService
                         result.TotalAmount, total.Confidence);
                 }
             }
+            
+            // Fallback: Try alternative total fields if main Total not found
+            if (result.TotalAmount == 0)
+            {
+                var totalFields = new[] { "AmountDue", "SubTotal", "TotalPrice", "GrandTotal" };
+                foreach (var fieldName in totalFields)
+                {
+                    if (receipt.Fields.TryGetValue(fieldName, out var altTotal) && altTotal != null 
+                        && altTotal.FieldType == DocumentFieldType.Currency)
+                    {
+                        var currencyValue = altTotal.Value.AsCurrency();
+                        result.TotalAmount = (decimal)currencyValue.Amount;
+                        _logger.LogDebug("Extracted Amount from {Field}: {Amount}", fieldName, result.TotalAmount);
+                        break;
+                    }
+                }
+            }
 
             // Extract receipt number (if available)
             if (receipt.Fields.TryGetValue("ReceiptNumber", out var receiptNumber) && receiptNumber != null)
@@ -137,6 +154,27 @@ public class ReceiptOcrService : IReceiptOcrService
             {
                 result.CardLastFour = last4.Content;
             }
+            
+            // Try to extract card info from other fields
+            if (string.IsNullOrEmpty(result.CardLastFour))
+            {
+                var cardFields = new[] { "CreditCardLast4", "CardNumber", "AccountNumber" };
+                foreach (var fieldName in cardFields)
+                {
+                    if (receipt.Fields.TryGetValue(fieldName, out var cardField) && cardField != null)
+                    {
+                        var cardContent = cardField.Content ?? "";
+                        // Extract last 4 digits from various formats like "****1234" or "XXXX-XXXX-XXXX-1234"
+                        var digits = new string(cardContent.Where(char.IsDigit).ToArray());
+                        if (digits.Length >= 4)
+                        {
+                            result.CardLastFour = digits.Substring(digits.Length - 4);
+                            _logger.LogDebug("Extracted Last4 from {Field}: {Last4}", fieldName, result.CardLastFour);
+                            break;
+                        }
+                    }
+                }
+            }
 
             // Build raw OCR text from all detected text
             var rawTextBuilder = new System.Text.StringBuilder();
@@ -148,6 +186,13 @@ public class ReceiptOcrService : IReceiptOcrService
                 }
             }
             result.RawText = rawTextBuilder.ToString();
+            
+            // Intelligent payment method detection if not found
+            if (string.IsNullOrEmpty(result.PaymentMethod) || result.PaymentMethod == PaymentMethods.Unknown)
+            {
+                result.PaymentMethod = DetectPaymentMethod(result.RawText, result.CardLastFour);
+                _logger.LogDebug("Detected Payment Method: {PaymentMethod}", result.PaymentMethod);
+            }
 
             _logger.LogInformation(
                 "OCR extraction successful: Vendor={Vendor}, Amount={Amount}, Date={Date}, Confidence={Confidence}",
@@ -196,6 +241,57 @@ public class ReceiptOcrService : IReceiptOcrService
         }
 
         return isValid;
+    }
+
+    /// <summary>
+    /// Intelligently detects payment method from receipt text
+    /// </summary>
+    private string DetectPaymentMethod(string rawText, string? cardLastFour)
+    {
+        if (string.IsNullOrWhiteSpace(rawText))
+            return PaymentMethods.Unknown;
+
+        var text = rawText.ToUpperInvariant();
+
+        // If we have card last 4 digits, it's likely a card payment
+        if (!string.IsNullOrEmpty(cardLastFour))
+        {
+            // Check for debit indicators
+            if (text.Contains("DEBIT") || text.Contains("DB ") || text.Contains("PIN"))
+                return PaymentMethods.DebitCard;
+            
+            // Otherwise assume credit card
+            return PaymentMethods.CreditCard;
+        }
+
+        // Check for specific payment methods in text
+        if (text.Contains("CASH") || text.Contains("CHANGE DUE") || text.Contains("TENDERED"))
+            return PaymentMethods.Cash;
+
+        if (text.Contains("CHECK") || text.Contains("CHEQUE"))
+            return PaymentMethods.Check;
+
+        if (text.Contains("WIRE") || text.Contains("TRANSFER") || text.Contains("ACH"))
+            return PaymentMethods.BankTransfer;
+
+        if (text.Contains("VISA") || text.Contains("MASTERCARD") || text.Contains("MASTER CARD") ||
+            text.Contains("AMEX") || text.Contains("AMERICAN EXPRESS") || text.Contains("DISCOVER"))
+        {
+            // Check if it's debit or credit
+            if (text.Contains("DEBIT"))
+                return PaymentMethods.DebitCard;
+            return PaymentMethods.CreditCard;
+        }
+
+        // Check for card-like patterns (numbers ending in 4 digits)
+        if (System.Text.RegularExpressions.Regex.IsMatch(text, @"\*+\d{4}|\d{4}\s*$"))
+        {
+            if (text.Contains("DEBIT"))
+                return PaymentMethods.DebitCard;
+            return PaymentMethods.CreditCard;
+        }
+
+        return PaymentMethods.Unknown;
     }
 }
 
