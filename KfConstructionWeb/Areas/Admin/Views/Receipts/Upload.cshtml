@@ -168,6 +168,43 @@
     <script>
         let ocrProcessing = false;
 
+        // Compress image to meet Azure 4MB limit
+        async function compressImage(file, maxSizeBytes) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        
+                        // Calculate scale to reduce file size
+                        const scale = Math.sqrt(maxSizeBytes / file.size);
+                        width = Math.floor(width * scale * 0.9); // 0.9 for safety margin
+                        height = Math.floor(height * scale * 0.9);
+                        
+                        canvas.width = width;
+                        canvas.height = height;
+                        
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        // Convert to blob with quality adjustment
+                        canvas.toBlob((blob) => {
+                            const compressedFile = new File([blob], file.name, {
+                                type: 'image/jpeg',
+                                lastModified: Date.now()
+                            });
+                            resolve(compressedFile);
+                        }, 'image/jpeg', 0.85); // 85% quality
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
         function previewFile(input) {
             const file = input.files[0];
             const preview = document.getElementById('imagePreview');
@@ -206,9 +243,16 @@
                 // Show info alert
                 showAlert('info', 'Processing receipt with AI OCR...', 'ocrAlert');
 
+                // Compress image if it's too large (Azure limit is 4MB for free tier)
+                let fileToUpload = file;
+                if (file.size > 4 * 1024 * 1024 && file.type.startsWith('image/')) {
+                    showAlert('info', 'Image is large, compressing for OCR processing...', 'ocrAlert');
+                    fileToUpload = await compressImage(file, 4 * 1024 * 1024); // 4MB limit
+                }
+
                 // Create form data
                 const formData = new FormData();
-                formData.append('file', file);
+                formData.append('file', fileToUpload);
                 
                 // Add anti-forgery token - try getting it from the form's hidden field
                 const form = document.getElementById('uploadForm');
