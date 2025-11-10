@@ -210,14 +210,18 @@
                 const formData = new FormData();
                 formData.append('file', file);
                 
-                // Add anti-forgery token
-                const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
-                formData.append('__RequestVerificationToken', token);
+                // Add anti-forgery token - try getting it from the form's hidden field
+                const form = document.getElementById('uploadForm');
+                const token = form.querySelector('input[name="__RequestVerificationToken"]');
+                if (token) {
+                    formData.append('__RequestVerificationToken', token.value);
+                }
 
                 // Call OCR endpoint
                 const response = await fetch('@Url.Action("ProcessOcr", "Receipts", new { area = "Admin" })', {
                     method: 'POST',
-                    body: formData
+                    body: formData,
+                    credentials: 'same-origin'  // Include cookies for authentication
                 });
 
                 if (!response.ok) {
