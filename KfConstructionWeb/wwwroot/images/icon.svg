@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- Background -->
+  <rect width="512" height="512" fill="#0d6efd" rx="80"/>
+  
+  <!-- Hammer and Wrench Icon -->
+  <g transform="translate(128, 128)">
+    <!-- Wrench -->
+    <path d="M150 50 L180 80 L200 60 L220 80 L190 110 L250 170 L220 200 L160 140 L130 170 L110 150 L130 130 L100 100 L150 50 Z" 
+          fill="white" stroke="white" stroke-width="8" stroke-linejoin="round"/>
+    
+    <!-- Hammer -->
+    <path d="M50 220 L100 170 L160 230 L220 170 L250 200 L190 260 L130 200 L80 250 L50 220 Z" 
+          fill="white" stroke="white" stroke-width="8" stroke-linejoin="round"/>
+    
+    <!-- Hammer Handle -->
+    <rect x="20" y="220" width="12" height="80" fill="white" transform="rotate(-45 26 260)"/>
+  </g>
+  
+  <!-- Text KF -->
+  <text x="256" y="420" font-family="Arial, sans-serif" font-size="80" font-weight="bold" 
+        text-anchor="middle" fill="white">KF</text>
+</svg>
