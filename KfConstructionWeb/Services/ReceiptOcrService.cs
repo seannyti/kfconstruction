@@ -265,15 +265,16 @@ public class ReceiptOcrService : IReceiptOcrService
         if (string.IsNullOrWhiteSpace(rawText))
             return 0;
 
-        // Common patterns for total amounts on receipts
+        // Common patterns for total amounts on receipts (ordered by priority)
         var patterns = new[]
         {
-            @"TOTAL[:\s]*\$?\s*(\d+\.\d{2})",           // "TOTAL: $12.34" or "TOTAL 12.34"
-            @"AMOUNT\s*DUE[:\s]*\$?\s*(\d+\.\d{2})",    // "AMOUNT DUE: $12.34"
-            @"GRAND\s*TOTAL[:\s]*\$?\s*(\d+\.\d{2})",   // "GRAND TOTAL: $12.34"
-            @"BALANCE[:\s]*\$?\s*(\d+\.\d{2})",         // "BALANCE: $12.34"
-            @"\$\s*(\d+\.\d{2})\s*USD",                 // "$12.34 USD"
-            @"USD\s*\$?\s*(\d+\.\d{2})"                 // "USD $12.34" or "USD 12.34"
+            @"(?:^|\s)TOTAL(?!\s*SUB)[:\s]*\$?\s*(\d+\.\d{2})",    // "TOTAL: $12.34" but NOT "TOTAL SUB"
+            @"GRAND\s*TOTAL[:\s]*\$?\s*(\d+\.\d{2})",              // "GRAND TOTAL: $12.34"
+            @"FINAL\s*TOTAL[:\s]*\$?\s*(\d+\.\d{2})",              // "FINAL TOTAL: $12.34"
+            @"AMOUNT\s*DUE[:\s]*\$?\s*(\d+\.\d{2})",               // "AMOUNT DUE: $12.34"
+            @"BALANCE[:\s]*DUE[:\s]*\$?\s*(\d+\.\d{2})",           // "BALANCE DUE: $12.34"
+            @"\$\s*(\d+\.\d{2})\s*USD",                            // "$12.34 USD"
+            @"USD\s*\$?\s*(\d+\.\d{2})"                            // "USD $12.34" or "USD 12.34"
         };
 
         foreach (var pattern in patterns)
