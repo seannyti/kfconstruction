@@ -169,6 +169,9 @@ public class ReceiptsController : BaseAdminController
         var stopwatch = Stopwatch.StartNew();
         var currentUser = GetCurrentUserId();
 
+        _logger.LogInformation("=== RECEIPT UPLOAD STARTED === User: {User}, HasFile: {HasFile}", 
+            currentUser, receiptFile != null);
+
         try
         {
             // Security: Rate limiting check (prevent DoS attacks)
@@ -334,7 +337,8 @@ public class ReceiptsController : BaseAdminController
         catch (Exception ex)
         {
             stopwatch.Stop();
-            _logger.LogError(ex, "Error uploading receipt (User: {User})", currentUser);
+            _logger.LogError(ex, "=== RECEIPT UPLOAD FAILED === Error: {Error}, User: {User}", 
+                ex.Message, currentUser);
             SetErrorMessage("An error occurred while uploading the receipt.");
             PopulateReceiptFormData();
             return View("Upload", model);
