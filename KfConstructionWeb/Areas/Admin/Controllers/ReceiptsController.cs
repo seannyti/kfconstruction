@@ -474,6 +474,116 @@ public class ReceiptsController : BaseAdminController
         }
     }
 
+    /// <summary>
+    /// AJAX endpoint: Process OCR on uploaded file and return extracted data
+    /// Security: CSRF protection, file validation, rate limiting
+    /// </summary>
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ProcessOcr(IFormFile file)
+    {
+        var stopwatch = Stopwatch.StartNew();
+        var currentUser = GetCurrentUserId();
+
+        try
+        {
+            // Security: Rate limiting check
+            var clientIp = GetClientIpAddress();
+            var rateLimitResult = await _rateLimitService.CheckRateLimitAsync(clientIp);
+            
+            if (!rateLimitResult.IsAllowed)
+            {
+                _logger.LogWarning(
+                    "Rate limit exceeded for OCR processing: IP={IpAddress}, Attempts={Attempts}/{Max}",
+                    clientIp, rateLimitResult.AttemptsInWindow, rateLimitResult.MaxAllowed);
+                    
+                return Json(new { 
+                    success = false, 
+                    error = "Too many upload attempts. Please try again later." 
+                });
+            }
+
+            // Validate file upload
+            if (file == null || file.Length == 0)
+            {
+                return Json(new { success = false, error = "No file provided." });
+            }
+
+            // Security: Comprehensive file validation
+            var (isValid, errorMessage, secureFileName) = FileValidationHelper.ValidateFileUpload(
+                file.FileName,
+                file.Length,
+                file.ContentType,
+                _allowedExtensions,
+                _maxFileSize);
+
+            if (!isValid)
+            {
+                _logger.LogWarning(
+                    "OCR file validation failed: {Error}, FileName: {FileName}, User: {User}",
+                    errorMessage, file.FileName, currentUser);
+                return Json(new { success = false, error = errorMessage });
+            }
+
+            _logger.LogInformation("Processing OCR for file: {FileName} ({Size} bytes) by {User}",
+                file.FileName, file.Length, currentUser);
+
+            // Run OCR Processing
+            OcrResult ocrResult;
+            using (var stream = file.OpenReadStream())
+            {
+                ocrResult = await _ocrService.ExtractReceiptDataAsync(stream, file.ContentType);
+            }
+
+            stopwatch.Stop();
+
+            if (!ocrResult.Success)
+            {
+                _logger.LogWarning("OCR processing failed: {Error}", ocrResult.ErrorMessage);
+                return Json(new { 
+                    success = false, 
+                    error = ocrResult.ErrorMessage ?? "Could not extract receipt data. Please enter manually." 
+                });
+            }
+
+            // Validate OCR results
+            var isValidOcr = _ocrService.ValidateOcrResults(ocrResult);
+
+            _logger.LogInformation(
+                "OCR processing completed: Vendor={Vendor}, Amount={Amount}, Date={Date}, Confidence={Confidence}, Valid={Valid}, Latency={Latency}ms",
+                ocrResult.Vendor, ocrResult.TotalAmount, ocrResult.PurchaseDate, ocrResult.Confidence, isValidOcr, stopwatch.ElapsedMilliseconds);
+
+            // Return extracted data as JSON
+            return Json(new
+            {
+                success = true,
+                data = new
+                {
+                    vendor = ocrResult.Vendor,
+                    purchaseDate = ocrResult.PurchaseDate != default ? ocrResult.PurchaseDate.ToString("yyyy-MM-dd") : null,
+                    totalAmount = ocrResult.TotalAmount > 0 ? ocrResult.TotalAmount : (decimal?)null,
+                    receiptNumber = ocrResult.ReceiptNumber,
+                    paymentMethod = ocrResult.PaymentMethod,
+                    cardLastFour = ocrResult.CardLastFour,
+                    confidence = ocrResult.Confidence,
+                    isValid = isValidOcr
+                },
+                message = isValidOcr 
+                    ? $"Receipt data extracted successfully (Confidence: {ocrResult.Confidence:P0})" 
+                    : "Receipt data extracted with low confidence. Please verify the details."
+            });
+        }
+        catch (Exception ex)
+        {
+            stopwatch.Stop();
+            _logger.LogError(ex, "Error processing OCR (User: {User})", currentUser);
+            return Json(new { 
+                success = false, 
+                error = "An error occurred while processing the receipt. Please try again." 
+            });
+        }
+    }
+
     #region Helper Methods
 
     /// <summary>

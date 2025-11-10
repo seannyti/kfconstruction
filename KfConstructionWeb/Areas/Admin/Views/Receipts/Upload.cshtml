@@ -166,6 +166,8 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     
     <script>
+        let ocrProcessing = false;
+
         function previewFile(input) {
             const file = input.files[0];
             const preview = document.getElementById('imagePreview');
@@ -181,13 +183,111 @@
             } else {
                 preview.style.display = 'none';
             }
+
+            // Automatically process OCR when file is selected
+            if (file) {
+                processOcr(file);
+            }
+        }
+
+        async function processOcr(file) {
+            // Prevent duplicate processing
+            if (ocrProcessing) return;
+            ocrProcessing = true;
+
+            const submitBtn = document.getElementById('submitBtn');
+            const originalBtnText = submitBtn.innerHTML;
+
+            try {
+                // Show processing indicator
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing OCR...';
+
+                // Show info alert
+                showAlert('info', 'Processing receipt with AI OCR...', 'ocrAlert');
+
+                // Create form data
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                // Add anti-forgery token
+                const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                formData.append('__RequestVerificationToken', token);
+
+                // Call OCR endpoint
+                const response = await fetch('@Url.Action("ProcessOcr", "Receipts", new { area = "Admin" })', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success && result.data) {
+                    // Auto-fill form fields
+                    if (result.data.vendor) {
+                        document.getElementById('Vendor').value = result.data.vendor;
+                    }
+                    if (result.data.purchaseDate) {
+                        document.getElementById('PurchaseDate').value = result.data.purchaseDate;
+                    }
+                    if (result.data.totalAmount) {
+                        document.getElementById('TotalAmount').value = result.data.totalAmount;
+                    }
+                    if (result.data.receiptNumber) {
+                        document.getElementById('ReceiptNumber').value = result.data.receiptNumber;
+                    }
+                    if (result.data.paymentMethod) {
+                        document.getElementById('PaymentMethod').value = result.data.paymentMethod;
+                    }
+                    if (result.data.cardLastFour) {
+                        document.getElementById('CardLastFour').value = result.data.cardLastFour;
+                    }
+
+                    // Show success message
+                    showAlert('success', result.message || 'Receipt data auto-filled successfully! Please review and submit.', 'ocrAlert');
+                } else {
+                    // OCR failed, show error
+                    showAlert('warning', result.error || 'Could not extract receipt data automatically. Please fill in the fields manually.', 'ocrAlert');
+                }
+
+            } catch (error) {
+                console.error('OCR processing error:', error);
+                showAlert('danger', 'An error occurred during OCR processing. Please fill in the fields manually.', 'ocrAlert');
+            } finally {
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
+                ocrProcessing = false;
+            }
+        }
+
+        function showAlert(type, message, elementId) {
+            // Remove existing alert if any
+            const existingAlert = document.getElementById(elementId);
+            if (existingAlert) {
+                existingAlert.remove();
+            }
+
+            // Create new alert
+            const alert = document.createElement('div');
+            alert.id = elementId;
+            alert.className = `alert alert-${type} alert-dismissible fade show`;
+            alert.innerHTML = `
+                <i class="bi bi-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+            // Insert after the info alert
+            const infoAlert = document.querySelector('.alert-info');
+            infoAlert.parentNode.insertBefore(alert, infoAlert.nextSibling);
         }
 
         // Show loading state on submit
         document.getElementById('uploadForm').addEventListener('submit', function() {
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;
-            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Uploading...';
         });
     </script>
 }
