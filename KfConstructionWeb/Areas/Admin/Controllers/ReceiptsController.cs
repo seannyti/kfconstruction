@@ -264,6 +264,9 @@ public class ReceiptsController : BaseAdminController
                 (encryptedPath, algorithm) = await _encryptionService.EncryptFileAsync(stream, secureFileName);
             }
 
+            _logger.LogWarning("=== ENCRYPTION COMPLETE === Path: {Path}, Algorithm: {Algorithm}, SecureFileName: {FileName}, ContentType: {ContentType}",
+                encryptedPath, algorithm, secureFileName, receiptFile.ContentType);
+
             // Step 3: Create receipt record
             var receipt = new Receipt
             {
