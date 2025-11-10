@@ -220,6 +220,10 @@
                     body: formData
                 });
 
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
                 const result = await response.json();
 
                 if (result.success && result.data) {
@@ -252,7 +256,8 @@
 
             } catch (error) {
                 console.error('OCR processing error:', error);
-                showAlert('danger', 'An error occurred during OCR processing. Please fill in the fields manually.', 'ocrAlert');
+                const errorMsg = error.message || error.toString() || 'Unknown error';
+                showAlert('danger', `OCR Error: ${errorMsg}. Please fill in the fields manually.`, 'ocrAlert');
             } finally {
                 // Re-enable submit button
                 submitBtn.disabled = false;
