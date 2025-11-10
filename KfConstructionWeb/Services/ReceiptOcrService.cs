@@ -87,6 +87,10 @@ public class ReceiptOcrService : IReceiptOcrService
             result.Confidence = receipt.Confidence;
             result.Success = true;
 
+            // Log all available fields for debugging
+            _logger.LogDebug("Available OCR fields: {Fields}", 
+                string.Join(", ", receipt.Fields.Keys));
+            
             // Extract merchant name
             if (receipt.Fields.TryGetValue("MerchantName", out var merchantName) && merchantName != null)
             {
@@ -187,6 +191,16 @@ public class ReceiptOcrService : IReceiptOcrService
             }
             result.RawText = rawTextBuilder.ToString();
             
+            // Last resort: Parse total from raw text if structured fields failed
+            if (result.TotalAmount == 0)
+            {
+                result.TotalAmount = ExtractTotalFromText(result.RawText);
+                if (result.TotalAmount > 0)
+                {
+                    _logger.LogDebug("Extracted Amount from raw text: {Amount}", result.TotalAmount);
+                }
+            }
+            
             // Intelligent payment method detection if not found
             if (string.IsNullOrEmpty(result.PaymentMethod) || result.PaymentMethod == PaymentMethods.Unknown)
             {
@@ -241,6 +255,40 @@ public class ReceiptOcrService : IReceiptOcrService
         }
 
         return isValid;
+    }
+
+    /// <summary>
+    /// Extracts total amount from raw OCR text using pattern matching
+    /// </summary>
+    private decimal ExtractTotalFromText(string rawText)
+    {
+        if (string.IsNullOrWhiteSpace(rawText))
+            return 0;
+
+        // Common patterns for total amounts on receipts
+        var patterns = new[]
+        {
+            @"TOTAL[:\s]*\$?\s*(\d+\.\d{2})",           // "TOTAL: $12.34" or "TOTAL 12.34"
+            @"AMOUNT\s*DUE[:\s]*\$?\s*(\d+\.\d{2})",    // "AMOUNT DUE: $12.34"
+            @"GRAND\s*TOTAL[:\s]*\$?\s*(\d+\.\d{2})",   // "GRAND TOTAL: $12.34"
+            @"BALANCE[:\s]*\$?\s*(\d+\.\d{2})",         // "BALANCE: $12.34"
+            @"\$\s*(\d+\.\d{2})\s*USD",                 // "$12.34 USD"
+            @"USD\s*\$?\s*(\d+\.\d{2})"                 // "USD $12.34" or "USD 12.34"
+        };
+
+        foreach (var pattern in patterns)
+        {
+            var match = System.Text.RegularExpressions.Regex.Match(
+                rawText, pattern, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            
+            if (match.Success && decimal.TryParse(match.Groups[1].Value, out var amount))
+            {
+                _logger.LogDebug("Extracted amount using pattern '{Pattern}': {Amount}", pattern, amount);
+                return amount;
+            }
+        }
+
+        return 0;
     }
 
     /// <summary>
