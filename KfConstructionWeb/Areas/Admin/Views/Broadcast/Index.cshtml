@@ -192,22 +192,20 @@
                                         }
                                     </td>
                                     <td class="text-end">
-                                        <div class="btn-group" role="group">
-                                            <a asp-action="Details" asp-route-id="@msg.Id" class="btn btn-sm btn-info" title="Details">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                            @if (msg.IsActive && !isExpired)
-                                            {
-                                                <button type="button" class="btn btn-sm btn-warning" 
-                                                        onclick="confirmDeactivate(@msg.Id, '@msg.Subject')" title="Deactivate">
-                                                    <i class="fas fa-pause"></i>
-                                                </button>
-                                            }
-                                            <button type="button" class="btn btn-sm btn-danger" 
-                                                    onclick="confirmDelete(@msg.Id, '@msg.Subject')" title="Delete">
-                                                <i class="fas fa-trash"></i>
+                                        <a asp-action="Details" asp-route-id="@msg.Id" class="btn btn-info text-white me-1">
+                                            View
+                                        </a>
+                                        @if (msg.IsActive && !isExpired)
+                                        {
+                                            <button type="button" class="btn btn-warning me-1" 
+                                                    onclick="confirmDeactivate(@msg.Id, '@msg.Subject')">
+                                                Deactivate
                                             </button>
-                                        </div>
+                                        }
+                                        <button type="button" class="btn btn-danger" 
+                                                onclick="confirmDelete(@msg.Id, '@msg.Subject')">
+                                            Delete
+                                        </button>
                                     </td>
                                 </tr>
                             }
