@@ -292,7 +292,9 @@ public class ReceiptsController : BaseAdminController
                 OcrRawText = ocrResult.RawText,
                 OcrConfidence = ocrResult.Confidence,
                 OcrProcessed = ocrResult.Success,
-                OcrError = ocrResult.ErrorMessage,
+                OcrError = ocrResult.ErrorMessage?.Length > 500 
+                    ? ocrResult.ErrorMessage.Substring(0, 500) 
+                    : ocrResult.ErrorMessage,
 
                 // Security metadata
                 IsEncrypted = true,
@@ -305,6 +307,9 @@ public class ReceiptsController : BaseAdminController
                 // Data retention
                 ScheduledPurgeDate = CalculatePurgeDate()
             };
+
+            _logger.LogWarning("=== RECEIPT OBJECT CREATED === EncryptedPath: {EncPath}, OriginalFileName: {OrigFile}, ContentType: {ContentType}, CreatedBy: {CreatedBy}, OcrErrorLength: {OcrErrorLen}",
+                receipt.EncryptedFilePath, receipt.OriginalFileName, receipt.ContentType, receipt.CreatedBy, receipt.OcrError?.Length ?? 0);
 
             _logger.LogWarning("=== RECEIPT DATA === Vendor: {Vendor}, Amount: {Amount}, Date: {Date}, Category: {Category}, Payment: {Payment}",
                 receipt.Vendor, receipt.TotalAmount, receipt.PurchaseDate, receipt.Category, receipt.PaymentMethod);
