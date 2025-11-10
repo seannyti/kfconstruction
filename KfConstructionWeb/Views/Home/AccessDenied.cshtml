@@ -1,0 +1,110 @@
+@{
+    ViewData["Title"] = "Access Denied";
+    var reason = ViewBag.Reason as string;
+    var isAccountLocked = reason == "account-locked";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white text-center">
+                    <h3><i class="bi bi-exclamation-triangle-fill me-2"></i>Access Denied</h3>
+                </div>
+                <div class="card-body text-center">
+                    @if (isAccountLocked)
+                    {
+                        <div class="mb-4">
+                            <i class="bi bi-lock-fill text-danger" style="font-size: 4rem;"></i>
+                        </div>
+                        <h4 class="text-danger mb-3">Account Locked</h4>
+                        <p class="lead mb-4">
+                            Your account has been temporarily or permanently locked by an administrator.
+                        </p>
+                        <div class="alert alert-warning">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>What this means:</strong>
+                            <ul class="list-unstyled mt-2 mb-0">
+                                <li>• You cannot access your account at this time</li>
+                                <li>• This action was taken for security or administrative reasons</li>
+                                <li>• Your account data remains safe and secure</li>
+                            </ul>
+                        </div>
+                        <div class="alert alert-info">
+                            <i class="bi bi-telephone me-2"></i>
+                            <strong>Need Help?</strong><br>
+                            Contact an administrator or use the information below to resolve this issue.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="mb-4">
+                            <i class="bi bi-shield-exclamation text-warning" style="font-size: 4rem;"></i>
+                        </div>
+                        <h4 class="text-warning mb-3">Access Denied</h4>
+                        <p class="lead mb-4">
+                            You do not have permission to access this resource.
+                        </p>
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            This may be because you don't have the required permissions or your session has expired.
+                        </div>
+                    }
+                    
+                    <!-- Contact Information (from site settings) -->
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h6 class="mb-0"><i class="bi bi-envelope me-2"></i>Contact Information</h6>
+                        </div>
+                        <div class="card-body">
+                            @if (!string.IsNullOrEmpty(ViewData["CompanyEmail"] as string))
+                            {
+                                <p class="mb-2">
+                                    <strong>Email:</strong> 
+                                    <a href="mailto:@ViewData["CompanyEmail"]">@ViewData["CompanyEmail"]</a>
+                                </p>
+                            }
+                            @if (!string.IsNullOrEmpty(ViewData["CompanyPhone"] as string))
+                            {
+                                <p class="mb-2">
+                                    <strong>Phone:</strong> 
+                                    <a href="tel:@ViewData["CompanyPhone"]">@ViewData["CompanyPhone"]</a>
+                                </p>
+                            }
+                            @if (string.IsNullOrEmpty(ViewData["CompanyEmail"] as string) && string.IsNullOrEmpty(ViewData["CompanyPhone"] as string))
+                            {
+                                <p class="text-muted mb-0">Please contact your system administrator for assistance.</p>
+                            }
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="mt-4">
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <a href="/Identity/Account/Logout" class="btn btn-outline-secondary me-2">
+                                <i class="bi bi-box-arrow-right me-2"></i>Sign Out
+                            </a>
+                        }
+                        else
+                        {
+                            <a href="/Identity/Account/Login" class="btn btn-primary me-2">
+                                <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+                            </a>
+                        }
+                        <a href="/" class="btn btn-outline-primary">
+                            <i class="bi bi-house me-2"></i>Return Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Log access denied event (if needed for analytics)
+        console.log('Access denied page loaded', { reason: '@reason' });
+    </script>
+}

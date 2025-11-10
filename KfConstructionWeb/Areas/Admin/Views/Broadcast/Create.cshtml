@@ -1,0 +1,150 @@
+@using KfConstructionWeb.Models
+
+@{
+    ViewData["Title"] = "Send Broadcast Message";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2>
+                        <i class="fas fa-paper-plane me-2"></i>Send Broadcast Message
+                    </h2>
+                    <p class="text-muted">Send announcements to all users or specific roles</p>
+                </div>
+                <a asp-area="Admin" asp-controller="Broadcast" asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Broadcasts
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+                        
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <div class="mb-3">
+                            <label for="subject" class="form-label">Subject *</label>
+                            <input type="text" class="form-control" id="subject" name="subject" required maxlength="200" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Message *</label>
+                            <textarea class="form-control" id="message" name="message" rows="6" required></textarea>
+                            <div class="form-text">You can use HTML for formatting</div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="messageType" class="form-label">Message Type</label>
+                                <select class="form-select" id="messageType" name="messageType">
+                                    @foreach (var type in (ViewBag.MessageTypes as List<string>) ?? new List<string>())
+                                    {
+                                        <option value="@type">@type</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="targetRole" class="form-label">Target Audience</label>
+                                <select class="form-select" id="targetRole" name="targetRole">
+                                    <option value="">All Users</option>
+                                    @foreach (var role in (ViewBag.Roles as List<string>) ?? new List<string>())
+                                    {
+                                        <option value="@role">@role Role</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="expiresAt" class="form-label">Expires At (Optional)</label>
+                            <input type="datetime-local" class="form-control" id="expiresAt" name="expiresAt" />
+                            <div class="form-text">Leave empty for no expiration</div>
+                        </div>
+
+                        <div class="card bg-light mb-3">
+                            <div class="card-body">
+                                <h6 class="card-title">Delivery Options</h6>
+                                
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="showInApp" name="showInApp" checked />
+                                    <label class="form-check-label" for="showInApp">
+                                        <i class="fas fa-bell text-info me-1"></i>
+                                        <strong>Show as in-app notification</strong>
+                                        <br />
+                                        <small class="text-muted">Users will see this message when they log in</small>
+                                    </label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="sendEmail" name="sendEmail" />
+                                    <label class="form-check-label" for="sendEmail">
+                                        <i class="fas fa-envelope text-primary me-1"></i>
+                                        <strong>Send via email</strong>
+                                        <br />
+                                        <small class="text-muted">Also send this message as an email to all recipients</small>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Preview your message before sending!</strong> The message will be sent to all matching users immediately.
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-paper-plane me-2"></i>Send Broadcast
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card bg-light">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-question-circle me-2"></i>Help
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <h6><i class="fas fa-palette text-primary me-2"></i>Message Types</h6>
+                    <ul class="small">
+                        <li><strong>Info</strong> - General information</li>
+                        <li><strong>Warning</strong> - Important notices</li>
+                        <li><strong>Alert</strong> - Urgent messages</li>
+                        <li><strong>Announcement</strong> - News and updates</li>
+                        <li><strong>Maintenance</strong> - System notifications</li>
+                    </ul>
+
+                    <h6 class="mt-3"><i class="fas fa-users text-success me-2"></i>Targeting</h6>
+                    <p class="small">Select "All Users" to send to everyone, or choose a specific role to target admins, clients, etc.</p>
+
+                    <h6 class="mt-3"><i class="fas fa-clock text-warning me-2"></i>Expiration</h6>
+                    <p class="small">Set an expiration date to automatically hide the message after a certain time.</p>
+
+                    <h6 class="mt-3"><i class="fas fa-code text-info me-2"></i>HTML Formatting</h6>
+                    <p class="small">You can use HTML tags like &lt;strong&gt;, &lt;em&gt;, &lt;ul&gt;, &lt;li&gt;, &lt;br&gt;, etc.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

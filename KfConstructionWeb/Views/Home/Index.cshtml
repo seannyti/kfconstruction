@@ -1,0 +1,74 @@
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="hero-section text-center py-5">
+            <i class="bi bi-buildings display-1 text-warning mb-3"></i>
+            <h1 class="display-3 fw-bold mb-3">@(ViewData["CompanyName"]?.ToString()?.ToUpper() ?? "KF CONSTRUCTION")</h1>
+            <p class="lead text-muted mb-4">@(ViewData["SiteDescription"] ?? "Building Excellence, Delivering Quality")</p>
+            
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                if (User.IsInRole("SuperAdmin") || User.IsInRole("Admin"))
+                {
+                    <div class="mt-4">
+                        <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="btn btn-primary btn-lg">
+                            <i class="bi bi-speedometer2 me-2"></i>Go to Admin Dashboard
+                        </a>
+                    </div>
+                }
+                else if (User.IsInRole("User"))
+                {
+                    <div class="mt-4">
+                        <a asp-area="Identity" asp-page="/Account/Manage/Index" class="btn btn-primary btn-lg">
+                            <i class="bi bi-person-circle me-2"></i>View My Profile
+                        </a>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-primary btn-lg">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+                    </a>
+                    <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-secondary btn-lg">
+                        <i class="bi bi-person-plus me-2"></i>Register
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5 g-4">
+    <div class="col-md-4">
+        <div class="card h-100 text-center">
+            <div class="card-body p-4">
+                <i class="bi bi-shield-check display-3 text-warning mb-3"></i>
+                <h5 class="card-title fw-bold">Safety First</h5>
+                <p class="card-text text-muted">Committed to maintaining the highest safety standards on every project.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 text-center">
+            <div class="card-body p-4">
+                <i class="bi bi-hammer display-3 text-warning mb-3"></i>
+                <h5 class="card-title fw-bold">Quality Work</h5>
+                <p class="card-text text-muted">Professional craftsmanship and attention to detail in every build.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 text-center">
+            <div class="card-body p-4">
+                <i class="bi bi-clock-history display-3 text-warning mb-3"></i>
+                <h5 class="card-title fw-bold">On Time</h5>
+                <p class="card-text text-muted">Dedicated to meeting deadlines and delivering projects as scheduled.</p>
+            </div>
+        </div>
+    </div>
+</div>

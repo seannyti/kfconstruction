@@ -1,0 +1,235 @@
+@using Microsoft.Extensions.Diagnostics.HealthChecks
+@using KfConstructionWeb.Models.Performance
+@{
+    ViewData["Title"] = "System Monitoring";
+    var healthStatus = ViewBag.HealthStatus as string;
+    var healthChecks = ViewBag.HealthChecks as IReadOnlyDictionary<string, HealthReportEntry>;
+    var metrics = ViewBag.PerformanceMetrics as Dictionary<string, PerformanceMetrics>;
+}
+
+<div class="container-fluid mt-4">
+    <div class="row mb-3">
+        <div class="col">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2><i class="bi bi-speedometer2 me-2"></i>System Monitoring</h2>
+                    <p class="text-muted">Real-time health checks and performance metrics</p>
+                </div>
+                <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+        <div class="col-auto">
+            <span class="badge @(healthStatus == "Healthy" ? "bg-success" : healthStatus == "Degraded" ? "bg-warning" : "bg-danger") fs-5">
+                @healthStatus
+            </span>
+        </div>
+    </div>
+
+    <!-- Health Checks -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-heart-pulse me-2"></i>Health Checks</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        @if (healthChecks != null)
+                        {
+                            foreach (var check in healthChecks)
+                            {
+                                var statusClass = check.Value.Status == HealthStatus.Healthy ? "success" :
+                                                 check.Value.Status == HealthStatus.Degraded ? "warning" : "danger";
+                                var iconClass = check.Value.Status == HealthStatus.Healthy ? "check-circle-fill" :
+                                               check.Value.Status == HealthStatus.Degraded ? "exclamation-triangle-fill" : "x-circle-fill";
+
+                                <div class="col-md-4 mb-3">
+                                    <div class="card h-100 border-@statusClass">
+                                        <div class="card-body">
+                                            <h6 class="card-title">
+                                                <i class="bi bi-@iconClass text-@statusClass me-2"></i>
+                                                @check.Key.Replace("_", " ").ToUpper()
+                                            </h6>
+                                            <p class="card-text small">
+                                                <span class="badge bg-@statusClass">@check.Value.Status</span>
+                                            </p>
+                                            @if (!string.IsNullOrEmpty(check.Value.Description))
+                                            {
+                                                <p class="card-text small text-muted mb-2">@check.Value.Description</p>
+                                            }
+                                            @if (check.Value.Data != null && check.Value.Data.Any())
+                                            {
+                                                <div class="small">
+                                                    @foreach (var data in check.Value.Data)
+                                                    {
+                                                        <div><strong>@data.Key:</strong> @data.Value</div>
+                                                    }
+                                                </div>
+                                            }
+                                            <small class="text-muted">Duration: @check.Value.Duration.TotalMilliseconds ms</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="col-12">
+                                <p class="text-muted">No health check data available</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Performance Metrics -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-graph-up me-2"></i>Performance Metrics (p95 Target: < 200ms)</h5>
+                    <a href="/api/health/metrics" class="btn btn-sm btn-light" target="_blank">
+                        <i class="bi bi-code-square me-1"></i>View JSON
+                    </a>
+                </div>
+                <div class="card-body">
+                    @if (metrics != null && metrics.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Operation</th>
+                                        <th class="text-end">Requests</th>
+                                        <th class="text-end">Avg (ms)</th>
+                                        <th class="text-end">p50 (ms)</th>
+                                        <th class="text-end">p95 (ms)</th>
+                                        <th class="text-end">p99 (ms)</th>
+                                        <th class="text-end">Min (ms)</th>
+                                        <th class="text-end">Max (ms)</th>
+                                        <th class="text-center">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var metric in metrics.OrderBy(m => m.Key))
+                                    {
+                                        var p95Met = metric.Value.P95LatencyMs <= 200;
+                                        var statusClass = p95Met ? "success" : "danger";
+
+                                        <tr>
+                                            <td><code class="small">@metric.Key</code></td>
+                                            <td class="text-end">@metric.Value.TotalRequests.ToString("N0")</td>
+                                            <td class="text-end">@metric.Value.AverageLatencyMs.ToString("N2")</td>
+                                            <td class="text-end">@metric.Value.P50LatencyMs</td>
+                                            <td class="text-end">
+                                                <strong class="text-@statusClass">@metric.Value.P95LatencyMs</strong>
+                                            </td>
+                                            <td class="text-end">@metric.Value.P99LatencyMs</td>
+                                            <td class="text-end">@metric.Value.MinLatencyMs</td>
+                                            <td class="text-end">@metric.Value.MaxLatencyMs</td>
+                                            <td class="text-center">
+                                                @if (p95Met)
+                                                {
+                                                    <span class="badge bg-success">
+                                                        <i class="bi bi-check-circle"></i> Met
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-danger">
+                                                        <i class="bi bi-exclamation-triangle"></i> Exceeded
+                                                    </span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="mt-3">
+                            <small class="text-muted">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Metrics are updated in real-time. p95 target is 200ms per OWASP ASVS L2 requirements.
+                            </small>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info mb-0">
+                            <i class="bi bi-info-circle me-2"></i>
+                            No performance metrics collected yet. Metrics will appear after receipt operations are performed.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- API Endpoints Info -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0"><i class="bi bi-terminal me-2"></i>Monitoring Endpoints</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Health Checks (Public)</h6>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <code>/health/live</code> - Liveness probe
+                                    <a href="/health/live" target="_blank" class="btn btn-sm btn-outline-primary ms-2">
+                                        <i class="bi bi-box-arrow-up-right"></i> Test
+                                    </a>
+                                </li>
+                                <li>
+                                    <code>/health/ready</code> - Readiness probe
+                                    <a href="/health/ready" target="_blank" class="btn btn-sm btn-outline-primary ms-2">
+                                        <i class="bi bi-box-arrow-up-right"></i> Test
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Metrics API (Admin Only)</h6>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <code>/api/health</code> - Detailed health report
+                                    <a href="/api/health" target="_blank" class="btn btn-sm btn-outline-success ms-2">
+                                        <i class="bi bi-box-arrow-up-right"></i> Test
+                                    </a>
+                                </li>
+                                <li>
+                                    <code>/api/health/metrics</code> - Performance metrics
+                                    <a href="/api/health/metrics" target="_blank" class="btn btn-sm btn-outline-success ms-2">
+                                        <i class="bi bi-box-arrow-up-right"></i> Test
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="alert alert-warning mt-3 mb-0">
+                        <i class="bi bi-shield-lock me-2"></i>
+                        <strong>Security Note:</strong> Health check endpoints are public for monitoring systems. 
+                        Detailed metrics require Admin authentication.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-refresh every 30 seconds
+        setTimeout(function() {
+            location.reload();
+        }, 30000);
+    </script>
+}

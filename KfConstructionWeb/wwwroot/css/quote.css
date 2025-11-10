@@ -1,0 +1,218 @@
+/* Quote Page Styles */
+
+/* Hero Section */
+.quote-hero {
+    background: linear-gradient(135deg, #FFC107 0%, #FF9800 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.quote-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.3;
+}
+
+.quote-hero .container {
+    position: relative;
+    z-index: 1;
+}
+
+/* Benefits Icons */
+.benefit-icon {
+    font-size: 2.5rem;
+    transition: transform 0.3s ease;
+}
+
+.benefit-item {
+    transition: transform 0.3s ease;
+}
+
+.benefit-item:hover {
+    transform: translateY(-5px);
+}
+
+.benefit-item:hover .benefit-icon {
+    transform: scale(1.1);
+}
+
+/* Quote Form Card */
+.quote-form-card {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.quote-form-card .card-body {
+    background: linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%);
+}
+
+/* Form Fields */
+.quote-form .form-control,
+.quote-form .form-select {
+    border-radius: 8px;
+    border: 2px solid #e0e0e0;
+    transition: all 0.3s ease;
+}
+
+.quote-form .form-control:focus,
+.quote-form .form-select:focus {
+    border-color: #FF9800;
+    box-shadow: 0 0 0 0.2rem rgba(255, 152, 0, 0.25);
+    transform: translateY(-2px);
+}
+
+.quote-form .form-control-lg {
+    padding: 0.75rem 1rem;
+}
+
+.quote-form .form-label {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.quote-form .form-label i {
+    margin-right: 0.25rem;
+}
+
+/* FAQ Accordion */
+.quote-faq .accordion-button {
+    font-weight: 600;
+    background-color: #f8f9fa;
+    color: #333;
+    border: none;
+    padding: 1.25rem 1.5rem;
+}
+
+.quote-faq .accordion-button:not(.collapsed) {
+    background-color: #FF9800;
+    color: white;
+    box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+}
+
+.quote-faq .accordion-button:focus {
+    box-shadow: 0 0 0 0.2rem rgba(255, 152, 0, 0.25);
+    border-color: #FF9800;
+}
+
+.quote-faq .accordion-button::after {
+    filter: brightness(0) saturate(100%);
+}
+
+.quote-faq .accordion-button:not(.collapsed)::after {
+    filter: brightness(0) saturate(100%) invert(1);
+}
+
+.quote-faq .accordion-item {
+    border: none;
+    margin-bottom: 0.75rem;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.quote-faq .accordion-body {
+    padding: 1.25rem 1.5rem;
+    background-color: white;
+    color: #666;
+    line-height: 1.6;
+}
+
+/* CTA Section */
+.quote-cta-card {
+    background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+}
+
+.quote-cta-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0V0zm20 20L0 40h40L20 20z' fill='%23ffffff' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
+    opacity: 0.5;
+}
+
+.quote-cta-card .card-body {
+    position: relative;
+    z-index: 1;
+}
+
+/* Required Field Indicator */
+.text-danger {
+    color: #dc3545;
+}
+
+/* Honeypot Field (Hidden) */
+.honeypot-field {
+    position: absolute !important;
+    left: -5000px !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* Form Text Helper */
+.form-text {
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* Button Hover Effects */
+.quote-form .btn-warning:hover {
+    background: linear-gradient(135deg, #FF9800 0%, #FFC107 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4);
+}
+
+.quote-form .btn-outline-secondary:hover {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .quote-hero h1 {
+        font-size: 2rem;
+    }
+    
+    .benefit-icon {
+        font-size: 2rem;
+    }
+    
+    .quote-form-card .card-body {
+        padding: 2rem 1.5rem !important;
+    }
+    
+    .quote-faq .accordion-button,
+    .quote-faq .accordion-body {
+        padding: 1rem;
+    }
+}
+
+/* Animation for form validation errors */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.quote-form .text-danger {
+    animation: shake 0.3s ease;
+}
+
+/* Loading state for submit button */
+.quote-form .btn-warning:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

@@ -1,0 +1,82 @@
+@using KfConstructionWeb.Models.ViewModels
+@model EditUserViewModel
+@{
+    ViewData["Title"] = "Edit User";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Edit User Information</h2>
+        <a asp-action="ViewProfile" asp-route-id="@Model.Id" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Profile
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form asp-action="Edit" method="post">
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="IsAdmin" />
+                <input type="hidden" asp-for="IsSuperAdmin" />
+
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label">Full Name</label>
+                    <input asp-for="Name" class="form-control" placeholder="Enter full name" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label">Email Address</label>
+                    <input asp-for="Email" class="form-control" placeholder="Enter email address" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Current Role</label>
+                    <div>
+                        @if (Model.IsSuperAdmin)
+                        {
+                            <span class="badge bg-dark">SuperAdmin</span>
+                            <small class="text-muted d-block mt-1">SuperAdmin role cannot be changed from this page</small>
+                        }
+                        else if (Model.IsAdmin)
+                        {
+                            <span class="badge bg-danger">Admin</span>
+                            @if (User.IsInRole("SuperAdmin"))
+                            {
+                                <small class="text-muted d-block mt-1">Use the user list to promote/demote this user</small>
+                            }
+                            else
+                            {
+                                <small class="text-muted d-block mt-1">Only SuperAdmin can change roles</small>
+                            }
+                        }
+                        else
+                        {
+                            <span class="badge bg-primary">User</span>
+                            @if (User.IsInRole("SuperAdmin"))
+                            {
+                                <small class="text-muted d-block mt-1">Use the user list to promote/demote this user</small>
+                            }
+                            else
+                            {
+                                <small class="text-muted d-block mt-1">Only SuperAdmin can change roles</small>
+                            }
+                        }
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> Save Changes
+                    </button>
+                    <a asp-action="ViewProfile" asp-route-id="@Model.Id" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

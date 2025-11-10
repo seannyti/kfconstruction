@@ -1,0 +1,302 @@
+@using KfConstructionWeb.Models.ViewModels
+@model UserProfileViewModel
+@{
+    ViewData["Title"] = "User Profile - " + Model.Email;
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>User Profile</h2>
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to User Management
+        </a>
+    </div>
+
+    <div class="row">
+        <!-- Account Information Card -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-person-circle me-2"></i>Account Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>User ID:</strong></div>
+                        <div class="col-sm-8"><code>@Model.Id</code></div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Email:</strong></div>
+                        <div class="col-sm-8">@Model.Email</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Username:</strong></div>
+                        <div class="col-sm-8">@Model.UserName</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Account Type:</strong></div>
+                        <div class="col-sm-8">
+                            @if (Model.IsSuperAdmin)
+                            {
+                                <span class="badge bg-danger">Super Admin</span>
+                            }
+                            else if (Model.IsAdmin)
+                            {
+                                <span class="badge bg-warning">Admin</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-primary">User</span>
+                            }
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Account Created:</strong></div>
+                        <div class="col-sm-8">@Model.AccountCreated.ToString("MMM dd, yyyy")</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Account Status:</strong></div>
+                        <div class="col-sm-8">
+                            @if (Model.IsCurrentlyLocked)
+                            {
+                                <span class="badge bg-danger">
+                                    <i class="bi bi-lock-fill me-1"></i>Locked
+                                </span>
+                                @if (Model.CurrentLock != null)
+                                {
+                                    <div class="small text-muted mt-1">
+                                        <strong>Reason:</strong> @Model.CurrentLock.Reason<br>
+                                        <strong>Status:</strong> @Model.CurrentLock.LockStatusText<br>
+                                        <strong>Locked by:</strong> @Model.CurrentLock.LockedBy on @Model.CurrentLock.LockedAt.ToString("MMM dd, yyyy 'at' HH:mm")
+                                        @if (Model.CurrentLock.LockedUntil.HasValue)
+                                        {
+                                            <br><strong>Expires:</strong> @Model.CurrentLock.LockedUntil.Value.ToString("MMM dd, yyyy 'at' HH:mm")
+                                        }
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <span class="badge bg-success">
+                                    <i class="bi bi-unlock-fill me-1"></i>Active
+                                </span>
+                            }
+                        </div>
+                    </div>
+                    @if (User.IsInRole("SuperAdmin"))
+                    {
+                        <div class="row mb-3">
+                            <div class="col-sm-4"><strong>Client IP:</strong></div>
+                            <div class="col-sm-8">
+                                <code>@Model.ClientIp</code>
+                                <small class="text-muted d-block">Current viewing session</small>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Member Information Card -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-person-badge me-2"></i>Member Information</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.MemberData != null)
+                    {
+                        <div class="row mb-3">
+                            <div class="col-sm-4"><strong>Member ID:</strong></div>
+                            <div class="col-sm-8"><code>@Model.MemberData.Id</code></div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-4"><strong>Name:</strong></div>
+                            <div class="col-sm-8">@Model.MemberData.Name</div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-4"><strong>Status:</strong></div>
+                            <div class="col-sm-8">
+                                @if (Model.MemberData.IsActive)
+                                {
+                                    <span class="badge bg-success">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Inactive</span>
+                                }
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-4"><strong>Member Since:</strong></div>
+                            <div class="col-sm-8">@Model.MemberData.CreatedAt.ToString("MMM dd, yyyy")</div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-muted">
+                            <i class="bi bi-info-circle me-2"></i>
+                            No member profile found for this user.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Administrative Actions Section -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-tools me-2"></i>Administrative Actions</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.Email == User.Identity!.Name)
+                    {
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>This is your account.</strong> Some administrative actions are restricted for security.
+                        </div>
+                    }
+                    
+                    <!-- Profile Management -->
+                    <div class="mb-4">
+                        <h6 class="text-primary"><i class="bi bi-person-gear me-2"></i>Profile Management</h6>
+                        <div class="btn-group me-2" role="group">
+                            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-primary">
+                                <i class="bi bi-pencil me-2"></i>Edit Profile
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Account Security -->
+                    @if (Model.CanManageLocks && !Model.IsSuperAdmin && Model.Email != User.Identity!.Name)
+                    {
+                        <div class="mb-4">
+                            <h6 class="text-warning"><i class="bi bi-shield-lock me-2"></i>Account Security</h6>
+                            <div class="btn-group me-2" role="group">
+                                @if (Model.IsCurrentlyLocked)
+                                {
+                                    <a asp-action="Unlock" asp-route-id="@Model.Id" class="btn btn-success">
+                                        <i class="bi bi-unlock me-2"></i>Unlock Account
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a asp-action="Lock" asp-route-id="@Model.Id" class="btn btn-warning">
+                                        <i class="bi bi-lock me-2"></i>Lock Account
+                                    </a>
+                                }
+                                <a asp-action="LockHistory" asp-route-id="@Model.Id" class="btn btn-outline-info">
+                                    <i class="bi bi-clock-history me-2"></i>Lock History
+                                </a>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Role Management -->
+                    @if (User.IsInRole("SuperAdmin") && !Model.IsSuperAdmin && Model.Email != User.Identity!.Name)
+                    {
+                        <div class="mb-4">
+                            <h6 class="text-info"><i class="bi bi-person-badge me-2"></i>Role Management</h6>
+                            <div class="btn-group me-2" role="group">
+                                @if (Model.IsAdmin)
+                                {
+                                    <form asp-action="ToggleAdmin" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to demote this user from Admin to User?');">
+                                        <input type="hidden" name="userId" value="@Model.Id" />
+                                        <button type="submit" class="btn btn-outline-warning">
+                                            <i class="bi bi-arrow-down-circle me-2"></i>Demote to User
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <form asp-action="ToggleAdmin" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to promote this user to Admin? They will have administrative privileges.');">
+                                        <input type="hidden" name="userId" value="@Model.Id" />
+                                        <button type="submit" class="btn btn-outline-success">
+                                            <i class="bi bi-arrow-up-circle me-2"></i>Promote to Admin
+                                        </button>
+                                    </form>
+                                }
+                            </div>
+                            <small class="text-muted d-block mt-2">
+                                <i class="bi bi-info-circle me-1"></i>
+                                @if (Model.IsAdmin)
+                                {
+                                    @:Demoting will remove admin privileges and convert to regular user.
+                                }
+                                else
+                                {
+                                    @:Promoting will grant admin access to user management and settings.
+                                }
+                            </small>
+                        </div>
+                    }
+
+                    <!-- Danger Zone -->
+                    @if (User.IsInRole("SuperAdmin") && !Model.IsSuperAdmin && Model.Email != User.Identity!.Name)
+                    {
+                        <div class="border border-danger rounded p-3">
+                            <h6 class="text-danger"><i class="bi bi-exclamation-triangle me-2"></i>Danger Zone</h6>
+                            <p class="text-muted mb-3">Irreversible and destructive actions.</p>
+                            <form asp-action="Delete" method="post" class="d-inline" onsubmit="return confirmUserDeletion('@Model.Email');">
+                                <input type="hidden" name="userId" value="@Model.Id" />
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="bi bi-trash me-2"></i>Delete User Account
+                                </button>
+                            </form>
+                            <small class="text-muted d-block mt-2">
+                                <i class="bi bi-exclamation-triangle me-1"></i>
+                                This will permanently delete the user account and all associated data. This action cannot be undone.
+                            </small>
+                        </div>
+                    }
+
+                    @if (Model.IsSuperAdmin || Model.Email == User.Identity!.Name)
+                    {
+                        @if (Model.IsSuperAdmin)
+                        {
+                            <div class="alert alert-secondary">
+                                <i class="bi bi-shield-fill-check me-2"></i>
+                                <strong>Super Admin Account:</strong> This account has the highest privileges and cannot be modified by other administrators.
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Enhanced delete confirmation
+        function confirmUserDeletion(userEmail) {
+            const confirmText = `DELETE ${userEmail}`;
+            const userInput = prompt(
+                `This will permanently delete the user account for "${userEmail}" and all associated data.\n\n` +
+                `This action cannot be undone!\n\n` +
+                `To confirm, type exactly: ${confirmText}`
+            );
+            
+            if (userInput === confirmText) {
+                return confirm(`Are you absolutely sure you want to delete "${userEmail}"? This is your final confirmation.`);
+            } else if (userInput !== null) {
+                alert('Confirmation text did not match. User deletion cancelled.');
+            }
+            
+            return false;
+        }
+
+        // Add visual feedback for action buttons
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add tooltips to buttons
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
+            console.log('User Profile View Loaded for:', '@Model.Email');
+        });
+    </script>
+}

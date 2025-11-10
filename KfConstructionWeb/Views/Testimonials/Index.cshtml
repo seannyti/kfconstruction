@@ -1,0 +1,217 @@
+@model IEnumerable<Testimonial>
+@{
+    ViewData["Title"] = "Client Testimonials & Reviews";
+    ViewData["Description"] = "Read what our clients say about KF Construction's quality workmanship and professional service.";
+    var averageRating = ViewBag.AverageRating as double? ?? 0;
+    var totalReviews = ViewBag.TotalReviews as int? ?? 0;
+    var ratingDistribution = ViewBag.RatingDistribution as Dictionary<int, int> ?? new Dictionary<int, int>();
+    var serviceType = ViewBag.ServiceType as ServiceType?;
+}
+
+<div class="testimonials-page">
+    <!-- Hero Section -->
+    <section class="hero-section bg-dark text-white py-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h1 class="display-4 fw-bold mb-3">Client Testimonials</h1>
+                    <p class="lead mb-4">
+                        Discover what our clients say about their experience working with KF Construction. 
+                        Your satisfaction is our commitment to excellence.
+                    </p>
+                </div>
+                <div class="col-lg-4 text-center">
+                    <div class="rating-overview bg-primary p-4 rounded">
+                        <div class="rating-stars mb-2">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <i class="fas fa-star @(i <= Math.Round(averageRating) ? "text-warning" : "text-muted")"></i>
+                            }
+                        </div>
+                        <h3 class="text-white mb-1">@averageRating.ToString("F1")</h3>
+                        <p class="text-white-50 mb-0">Based on @totalReviews reviews</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filter and Actions Section -->
+    <section class="py-4 bg-light">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="filter-buttons">
+                        <a href="@Url.Action("Index")" class="btn btn-primary me-2">ALL REVIEWS</a>
+                    </div>
+                </div>
+                <div class="col-md-6 text-end">
+                    <a href="@Url.Action("Submit")" class="btn btn-success btn-lg">
+                        <i class="fas fa-plus me-2"></i>Share Your Experience
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Rating Distribution (if there are reviews) -->
+    @if (totalReviews > 0)
+    {
+        <section class="py-4">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8 mx-auto">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title mb-3">Rating Breakdown</h5>
+                                @for (int star = 5; star >= 1; star--)
+                                {
+                                    var count = ratingDistribution.GetValueOrDefault(star, 0);
+                                    var percentage = totalReviews > 0 ? (double)count / totalReviews * 100 : 0;
+                                    
+                                    <div class="rating-bar mb-2">
+                                        <div class="row align-items-center">
+                                            <div class="col-2">
+                                                <small>@star ⭐</small>
+                                            </div>
+                                            <div class="col-8">
+                                                <div class="progress">
+                                                    <div class="progress-bar bg-warning" style="width: @percentage%"></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-2 text-end">
+                                                <small>@count</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    }
+
+    <!-- Testimonials Grid -->
+    <section class="py-5">
+        <div class="container">
+            @if (Model.Any())
+            {
+                <div class="row">
+                    @foreach (var testimonial in Model)
+                    {
+                        <div class="col-lg-6 col-xl-4 mb-4">
+                            <div class="card h-100 testimonial-card @(testimonial.IsFeatured ? "border-warning" : "")">
+                                @if (testimonial.IsFeatured)
+                                {
+                                    <div class="featured-badge position-absolute top-0 end-0">
+                                        <span class="badge bg-warning text-dark">
+                                            <i class="fas fa-star me-1"></i>Featured
+                                        </span>
+                                    </div>
+                                }
+                                
+                                <div class="card-body d-flex flex-column">
+                                    <!-- Rating -->
+                                    <div class="rating mb-3">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            <i class="fas fa-star @(i <= testimonial.Rating ? "text-warning" : "text-muted")"></i>
+                                        }
+                                    </div>
+
+                                    <!-- Testimonial Content -->
+                                    <blockquote class="flex-grow-1 mb-3">
+                                        <p class="card-text">"@testimonial.Content"</p>
+                                    </blockquote>
+
+                                    <!-- Client Info -->
+                                    <div class="client-info">
+                                        <div class="row align-items-center">
+                                            @if (!string.IsNullOrEmpty(testimonial.PhotoUrl))
+                                            {
+                                                <div class="col-auto">
+                                                    <img src="@testimonial.PhotoUrl" alt="@testimonial.Name" 
+                                                         class="rounded-circle client-photo">
+                                                </div>
+                                            }
+                                            <div class="col">
+                                                <h6 class="mb-1 fw-bold">@testimonial.DisplayName</h6>
+                                                @if (!string.IsNullOrEmpty(testimonial.Location))
+                                                {
+                                                    <small class="text-muted">
+                                                        <i class="fas fa-map-marker-alt me-1"></i>@testimonial.Location
+                                                    </small>
+                                                }
+                                                @if (testimonial.ServiceType.HasValue)
+                                                {
+                                                    <div class="mt-1">
+                                                        <span class="badge bg-secondary">@(testimonial.ServiceType?.ToString() != null ? System.Text.RegularExpressions.Regex.Replace(testimonial.ServiceType.ToString()!, "([a-z])([A-Z])", "$1 $2") : "")</span>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Service Type Display -->
+                                    @if (testimonial.ServiceType.HasValue)
+                                    {
+                                        <div class="mt-3">
+                                            <small class="text-muted">
+                                                <i class="fas fa-hammer me-1"></i>
+                                                Service: @testimonial.ServiceType.Value.ToString()
+                                            </small>
+                                        </div>
+                                    }
+
+                                    <!-- Date -->
+                                    <div class="mt-2">
+                                        <small class="text-muted">
+                                            @testimonial.PublishedAt?.ToString("MMMM yyyy")
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Load More Button (if needed for pagination in future) -->
+                <div class="text-center mt-4">
+                    <p class="text-muted">Showing @Model.Count() testimonial@(Model.Count() != 1 ? "s" : "")</p>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-comment-dots fa-3x text-muted"></i>
+                    </div>
+                    <h3 class="text-muted mb-3">No testimonials yet</h3>
+                    <p class="text-muted mb-4">
+                        @if (serviceType.HasValue)
+                        {
+                            <text>No testimonials found for @(serviceType?.ToString() != null ? System.Text.RegularExpressions.Regex.Replace(serviceType.ToString()!, "([a-z])([A-Z])", "$1 $2") : "") projects.</text>
+                        }
+                        else
+                        {
+                            <text>Be the first to share your experience with KF Construction!</text>
+                        }
+                    </p>
+                    <a href="@Url.Action("Submit")" class="btn btn-primary btn-lg">
+                        <i class="fas fa-plus me-2"></i>Submit a Testimonial
+                    </a>
+                </div>
+            }
+        </div>
+    </section>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/testimonials.css" />
+}
+
+@section Scripts {
+    <script src="~/js/testimonials.js"></script>
+}

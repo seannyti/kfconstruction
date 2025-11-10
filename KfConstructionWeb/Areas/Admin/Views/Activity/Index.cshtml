@@ -1,0 +1,190 @@
+@model List<KfConstructionWeb.Models.ActivityLog>
+@{
+    ViewData["Title"] = "Activity & Audit Logs";
+}
+
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="display-6">
+                        <i class="bi bi-clock-history me-2"></i>Activity & Audit Logs
+                    </h1>
+                    <p class="text-muted">Comprehensive system activity tracking and audit trail</p>
+                </div>
+                <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form asp-action="Index" method="get">
+                <div class="row g-3">
+                    <div class="col-md-2">
+                        <label class="form-label">Category</label>
+                        <select class="form-select" name="category">
+                            <option value="">All Categories</option>
+                            @foreach (var cat in (List<string>)ViewBag.Categories)
+                            {
+                                <option value="@cat" selected="@(ViewBag.CurrentCategory == cat)">@cat</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Severity</label>
+                        <select class="form-select" name="severity">
+                            <option value="">All Severities</option>
+                            @foreach (var sev in (List<string>)ViewBag.Severities)
+                            {
+                                <option value="@sev" selected="@(ViewBag.CurrentSeverity == sev)">@sev</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Performed By</label>
+                        <input type="text" class="form-control" name="performedBy" 
+                               value="@ViewBag.CurrentPerformedBy" placeholder="Email...">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Start Date</label>
+                        <input type="date" class="form-control" name="startDate" 
+                               value="@ViewBag.CurrentStartDate?.ToString("yyyy-MM-dd")">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">End Date</label>
+                        <input type="date" class="form-control" name="endDate" 
+                               value="@ViewBag.CurrentEndDate?.ToString("yyyy-MM-dd")">
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-funnel me-2"></i>Filter
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Activity Table -->
+    @if (Model.Any())
+    {
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Category</th>
+                                <th>Action</th>
+                                <th>Performed By</th>
+                                <th>Description</th>
+                                <th>Entity</th>
+                                <th>Severity</th>
+                                <th>IP Address</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var log in Model)
+                            {
+                                var rowClass = log.Severity switch
+                                {
+                                    "Critical" => "table-danger",
+                                    "Error" => "table-warning",
+                                    "Warning" => "table-info",
+                                    _ => ""
+                                };
+                                
+                                <tr class="@rowClass">
+                                    <td class="text-nowrap">
+                                        <small>@log.Timestamp.ToString("MMM dd, HH:mm:ss")</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary">@log.Category</span>
+                                    </td>
+                                    <td>@log.Action</td>
+                                    <td>
+                                        <small>@log.PerformedBy</small>
+                                    </td>
+                                    <td>
+                                        @if (!string.IsNullOrWhiteSpace(log.Description))
+                                        {
+                                            <small>@log.Description</small>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">—</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (!string.IsNullOrWhiteSpace(log.EntityType))
+                                        {
+                                            <small>@log.EntityType #@log.EntityId</small>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">—</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @{
+                                            var badgeClass = log.Severity switch
+                                            {
+                                                "Critical" => "bg-danger",
+                                                "Error" => "bg-warning text-dark",
+                                                "Warning" => "bg-info text-dark",
+                                                _ => "bg-success"
+                                            };
+                                        }
+                                        <span class="badge @badgeClass">@log.Severity</span>
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">@(log.IpAddress ?? "—")</small>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                @if (ViewBag.TotalPages > 1)
+                {
+                    <nav class="mt-3">
+                        <ul class="pagination justify-content-center">
+                            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                            {
+                                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                    <a class="page-link" asp-action="Index" asp-route-page="@i"
+                                       asp-route-category="@ViewBag.CurrentCategory"
+                                       asp-route-severity="@ViewBag.CurrentSeverity"
+                                       asp-route-performedBy="@ViewBag.CurrentPerformedBy"
+                                       asp-route-startDate="@ViewBag.CurrentStartDate"
+                                       asp-route-endDate="@ViewBag.CurrentEndDate">
+                                        @i
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </nav>
+                }
+
+                <p class="text-muted text-center mt-3">
+                    Showing @Model.Count of @ViewBag.TotalCount activity logs
+                </p>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle me-2"></i>
+            No activity logs found matching your criteria.
+        </div>
+    }
+</div>

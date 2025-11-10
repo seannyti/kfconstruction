@@ -1,0 +1,94 @@
+@model KfConstructionWeb.Models.ViewModels.FileUploadViewModel
+@{
+    ViewData["Title"] = "Upload File";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3>
+                            <i class="bi bi-cloud-upload me-2"></i>Upload File
+                        </h3>
+                        <a asp-area="Admin" asp-controller="Files" asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-arrow-left"></i> Back to Files
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Upload" method="post" enctype="multipart/form-data">
+                        <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="File" class="form-label">
+                                Select File <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="File" class="form-control" type="file" />
+                            <span asp-validation-for="File" class="text-danger"></span>
+                            <small class="form-text text-muted">
+                                Maximum file size: 50MB. 
+                                Allowed types: Images, PDFs, Office documents, ZIP archives.
+                            </small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Category" class="form-label">
+                                Category <span class="text-danger">*</span>
+                            </label>
+                            <select asp-for="Category" class="form-select">
+                                @foreach (var category in (List<string>)ViewBag.Categories)
+                                {
+                                    <option value="@category">@category</option>
+                                }
+                            </select>
+                            <span asp-validation-for="Category" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label">Description</label>
+                            <textarea asp-for="Description" class="form-control" rows="3" 
+                                      placeholder="Optional description of the file..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Tags" class="form-label">Tags</label>
+                            <input asp-for="Tags" class="form-control" 
+                                   placeholder="Separate tags with commas (e.g., project-a, 2025, contract)" />
+                            <span asp-validation-for="Tags" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input asp-for="IsPublic" class="form-check-input" />
+                            <label asp-for="IsPublic" class="form-check-label">
+                                Make this file public (accessible to non-admin users)
+                            </label>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input asp-for="EncryptFile" class="form-check-input" />
+                            <label asp-for="EncryptFile" class="form-check-label">
+                                Encrypt this file (recommended for sensitive documents)
+                            </label>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-x-circle me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-cloud-upload me-2"></i>Upload File
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

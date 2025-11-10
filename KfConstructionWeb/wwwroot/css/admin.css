@@ -1,0 +1,161 @@
+/* Admin area specific styles */
+
+/* Simple responsive table */
+.table-responsive {
+    overflow: visible;
+}
+
+/* Simple table styling */
+.table {
+    width: 100%;
+    table-layout: auto;
+}
+
+/* Basic cell styling */
+.table th,
+.table td {
+    padding: 0.75rem;
+    vertical-align: middle;
+    border-top: 1px solid #dee2e6;
+    position: relative; /* Ensure proper stacking context */
+}
+
+.table th {
+    font-weight: 600;
+    border-bottom: 2px solid #dee2e6;
+}
+
+/* Ensure table rows don't interfere with dropdowns */
+.table tbody tr {
+    z-index: 1;
+}
+
+/* When dropdown is open, ensure the parent row has higher z-index */
+.table tbody tr:has(.dropdown.show) {
+    z-index: 1056;
+}
+
+/* Email column - just limit width and add ellipsis */
+.table td:nth-child(2) {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Add hover tooltip for emails */
+.table td:nth-child(2):hover {
+    overflow: visible;
+    white-space: normal;
+    word-break: break-all;
+}
+
+/* Actions column - ensure proper positioning */
+.table td:last-child {
+    position: relative;
+    z-index: 10; /* Ensure actions column is above other content */
+}
+
+/* Dropdown positioning with boundary detection */
+.dropdown-menu {
+    position: absolute !important;
+    z-index: 1060 !important; /* Higher than Bootstrap's default 1050 */
+    max-width: 160px; /* Limit dropdown width */
+    box-shadow: 0 6px 12px rgba(0,0,0,0.175); /* Better shadow for depth */
+}
+
+/* Ensure dropdown button has proper z-index when active */
+.dropdown.show .dropdown-toggle {
+    z-index: 1055;
+}
+
+/* Ensure the entire dropdown container has proper layering */
+.dropdown.show {
+    z-index: 1055;
+}
+
+/* Force dropdown to stay within viewport */
+.dropdown-menu-end {
+    right: 0 !important;
+    left: auto !important;
+    transform: none !important;
+    margin-right: 0 !important;
+}
+
+/* Alternative approach - force left alignment when needed */
+@media (max-width: 1400px) {
+    .dropdown-menu-end {
+        right: auto !important;
+        left: 0 !important;
+    }
+}
+
+/* Hide registered column on medium screens to make more room */
+@media (max-width: 1200px) {
+    .table td:nth-child(4),
+    .table th:nth-child(4) {
+        display: none;
+    }
+}
+
+/* Additional responsive adjustments */
+@media (max-width: 992px) {
+    .table td:nth-child(2) {
+        max-width: 150px;
+    }
+}
+
+/* Responsive behavior for smaller screens */
+@media (max-width: 768px) {
+    /* Hide registered column on tablets */
+    .table td:nth-child(4),
+    .table th:nth-child(4) {
+        display: none;
+    }
+    
+    /* Make email column smaller */
+    .table td:nth-child(2),
+    .table th:nth-child(2) {
+        min-width: 150px;
+        max-width: 200px;
+        font-size: 0.9rem;
+    }
+    
+    /* Make role badges smaller */
+    .table td:nth-child(3) .badge {
+        font-size: 0.7rem;
+    }
+}
+
+@media (max-width: 576px) {
+    /* Stack table content more aggressively */
+    .table td:nth-child(1),
+    .table th:nth-child(1) {
+        min-width: 60px;
+    }
+    
+    .table td:nth-child(2),
+    .table th:nth-child(2) {
+        min-width: 120px;
+        max-width: 150px;
+        font-size: 0.8rem;
+    }
+    
+    .table td:nth-child(3),
+    .table th:nth-child(3) {
+        width: 80px;
+        min-width: 80px;
+    }
+    
+    .table td:nth-child(5),
+    .table th:nth-child(5) {
+        width: 80px;
+        min-width: 80px;
+    }
+    
+    /* Make actions button smaller */
+    .table .btn-sm {
+        font-size: 0.7rem;
+        padding: 0.25rem 0.5rem;
+    }
+}

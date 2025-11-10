@@ -1,0 +1,217 @@
+@using KfConstructionWeb.Models.ViewModels
+@model List<UserViewModel>
+@{
+    ViewData["Title"] = "User Management";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2><i class="bi bi-people me-2"></i>User Management</h2>
+            <p class="text-muted mb-0">Click on any user to view their profile and manage their account</p>
+        </div>
+        <a asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" id="userSearch" class="form-control" placeholder="Search by name, email, or role..." />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select id="roleFilter" class="form-select">
+                        <option value="">All Roles</option>
+                        <option value="SuperAdmin">Super Admin</option>
+                        <option value="Admin">Admin</option>
+                        <option value="User">User</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-muted">
+                        <small><span id="userCount">@Model.Count</span> user(s) found</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" id="usersTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="px-4 py-3">Name</th>
+                            <th class="px-4 py-3">Email</th>
+                            <th class="px-4 py-3">Role</th>
+                            <th class="px-4 py-3">Registered</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in Model)
+                        {
+                            <tr class="user-row clickable-row" data-user-id="@user.Id" 
+                                data-name="@user.Name" data-email="@user.Email" 
+                                data-role="@(user.IsSuperAdmin ? "SuperAdmin" : user.IsAdmin ? "Admin" : "User")"
+                                style="cursor: pointer;">
+                                <td class="px-4 py-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-circle me-3">
+                                            @user.Name.FirstOrDefault()
+                                        </div>
+                                        <strong>@user.Name</strong>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3" title="@user.Email">
+                                    @user.Email
+                                </td>
+                                <td class="px-4 py-3">
+                                    @if (user.IsSuperAdmin)
+                                    {
+                                        <span class="badge bg-dark"><i class="bi bi-shield-fill me-1"></i>Super Admin</span>
+                                    }
+                                    else if (user.IsAdmin)
+                                    {
+                                        <span class="badge bg-danger"><i class="bi bi-person-badge me-1"></i>Admin</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-primary"><i class="bi bi-person me-1"></i>User</span>
+                                    }
+                                </td>
+                                <td class="px-4 py-3">
+                                    @if (user.CreatedAt != DateTime.MinValue)
+                                    {
+                                        <span title="@user.CreatedAt.ToString("MMM dd, yyyy 'at' HH:mm")">
+                                            @user.CreatedAt.ToString("MMM dd, yyyy")
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">N/A</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            
+            @if (!Model.Any())
+            {
+                <div class="text-center text-muted py-5">
+                    <i class="bi bi-people display-4 text-muted mb-3"></i>
+                    <p class="mb-0">No users found.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .clickable-row {
+            transition: all 0.2s ease;
+        }
+        
+        .clickable-row:hover {
+            background-color: var(--bs-primary-bg-subtle) !important;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .avatar-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .table th {
+            border-bottom: 2px solid #dee2e6;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .user-row {
+            border-left: 3px solid transparent;
+        }
+        
+        .user-row:hover {
+            border-left-color: var(--bs-primary);
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('userSearch');
+            const roleFilter = document.getElementById('roleFilter');
+            const userRows = document.querySelectorAll('.user-row');
+            const userCount = document.getElementById('userCount');
+            
+            // Search and filter functionality
+            function filterUsers() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const selectedRole = roleFilter.value;
+                let visibleCount = 0;
+                
+                userRows.forEach(row => {
+                    const name = row.dataset.name.toLowerCase();
+                    const email = row.dataset.email.toLowerCase();
+                    const role = row.dataset.role;
+                    
+                    const matchesSearch = name.includes(searchTerm) || email.includes(searchTerm);
+                    const matchesRole = !selectedRole || role === selectedRole;
+                    
+                    if (matchesSearch && matchesRole) {
+                        row.style.display = '';
+                        visibleCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+                
+                userCount.textContent = visibleCount;
+            }
+            
+            // Event listeners for search and filter
+            searchInput.addEventListener('input', filterUsers);
+            roleFilter.addEventListener('change', filterUsers);
+            
+            // Click handler for user rows
+            userRows.forEach(row => {
+                row.addEventListener('click', function() {
+                    const userId = this.dataset.userId;
+                    window.location.href = `@Url.Action("ViewProfile")?id=${userId}`;
+                });
+            });
+            
+            // Add visual feedback on click
+            userRows.forEach(row => {
+                row.addEventListener('mousedown', function() {
+                    this.style.transform = 'translateY(0px)';
+                });
+                
+                row.addEventListener('mouseup', function() {
+                    this.style.transform = 'translateY(-1px)';
+                });
+            });
+        });
+    </script>
+}

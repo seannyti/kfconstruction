@@ -1,0 +1,33 @@
+@{
+    ViewData["Title"] = "Database Users Diagnostics";
+}
+
+<div class="container mt-4">
+    <h1>Database Users Diagnostics</h1>
+    <p class="lead">Total Users in Database: <strong>@ViewBag.TotalUsers</strong></p>
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">All Users Currently in Database</h5>
+        </div>
+        <div class="card-body">
+            @if (ViewBag.TotalUsers == 0)
+            {
+                <div class="alert alert-info">No users found in database.</div>
+            }
+            else
+            {
+                <ul class="list-group">
+                    @foreach (var user in ViewBag.Users)
+                    {
+                        <li class="list-group-item">@user</li>
+                    }
+                </ul>
+            }
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Back to Home</a>
+    </div>
+</div>

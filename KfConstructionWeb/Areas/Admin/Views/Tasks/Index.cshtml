@@ -1,0 +1,56 @@
+@model IReadOnlyCollection<KfConstructionWeb.Models.Tasks.ScheduledTaskInfo>
+@{
+    ViewData["Title"] = "Scheduled Tasks";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Scheduled Tasks</h2>
+    <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Dashboard
+    </a>
+</div>
+
+<table class="table table-striped table-bordered align-middle">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Last Run</th>
+            <th>Duration</th>
+            <th>Status</th>
+            <th>Next Run (UTC)</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var t in Model.OrderBy(m => m.Name))
+    {
+        var statusBadge = t.LastSucceeded == true ? "bg-success" : t.LastSucceeded == false ? "bg-danger" : "bg-secondary";
+        var statusText = t.LastMessage ?? (t.LastSucceeded == true ? "Success" : t.LastSucceeded == false ? "Failed" : "Unknown");
+        <tr>
+            <td>@t.Name</td>
+            <td>@t.Description</td>
+            <td>
+                @if (t.LastStartUtc.HasValue)
+                {
+                    <text>@t.LastStartUtc.Value.ToString("u")</text>
+                }
+                else
+                {
+                    <span class="text-muted">—</span>
+                }
+            </td>
+            <td>@(t.LastDuration?.ToString() ?? "—")</td>
+            <td><span class="badge @statusBadge">@statusText</span></td>
+            <td>@(t.NextRunUtc?.ToString("u") ?? "—")</td>
+        </tr>
+    }
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="6" class="text-muted small">
+                Backup Verification schedule: @ViewBag.BackupVerificationSchedule
+            </td>
+        </tr>
+    </tfoot>
+    
+</table>

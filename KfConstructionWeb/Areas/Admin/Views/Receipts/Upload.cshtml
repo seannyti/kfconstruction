@@ -1,0 +1,193 @@
+@model KfConstructionWeb.Models.Receipt
+@{
+    ViewData["Title"] = "Upload Receipt";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0"><i class="bi bi-receipt me-2"></i>Upload Receipt</h4>
+                        <a asp-area="Admin" asp-controller="Receipts" asp-action="Index" class="btn btn-outline-light btn-sm">
+                            <i class="bi bi-arrow-left"></i> Back to Receipts
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show">
+                            <i class="bi bi-check-circle me-2"></i>@TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show">
+                            <i class="bi bi-exclamation-triangle me-2"></i>@TempData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>OCR Enabled:</strong> Upload a receipt image and our AI will automatically extract vendor, date, amount, and payment details!
+                    </div>
+
+                    <form asp-action="Upload" method="post" enctype="multipart/form-data" id="uploadForm">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <!-- File Upload -->
+                        <div class="mb-4">
+                            <label for="receiptFile" class="form-label fw-bold">
+                                <i class="bi bi-file-earmark-image me-1"></i>Receipt Image/PDF
+                            </label>
+                            <input type="file" 
+                                   class="form-control" 
+                                   id="receiptFile" 
+                                   name="receiptFile" 
+                                   accept=".jpg,.jpeg,.png,.pdf" 
+                                   required 
+                                   onchange="previewFile(this)">
+                            <small class="form-text text-muted">
+                                Accepted formats: JPG, PNG, PDF (Max 10MB)
+                            </small>
+                        </div>
+
+                        <!-- Image Preview -->
+                        <div class="mb-4" id="imagePreview" style="display: none;">
+                            <label class="form-label fw-bold">Preview:</label>
+                            <div class="border rounded p-2 text-center">
+                                <img id="previewImage" src="" alt="Receipt Preview" style="max-width: 100%; max-height: 300px;">
+                            </div>
+                        </div>
+
+                        <!-- Manual Entry Fields (OCR will auto-fill these) -->
+                        <hr class="my-4">
+                        <h5 class="mb-3">Receipt Details (Auto-filled by OCR or enter manually)</h5>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Vendor" class="form-label fw-bold"></label>
+                                <input asp-for="Vendor" class="form-control" placeholder="e.g., Home Depot" required />
+                                <span asp-validation-for="Vendor" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="PurchaseDate" class="form-label fw-bold"></label>
+                                <input asp-for="PurchaseDate" class="form-control" type="date" required />
+                                <span asp-validation-for="PurchaseDate" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="TotalAmount" class="form-label fw-bold"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input asp-for="TotalAmount" class="form-control" type="number" step="0.01" placeholder="0.00" required />
+                                </div>
+                                <span asp-validation-for="TotalAmount" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Category" class="form-label fw-bold"></label>
+                                <select asp-for="Category" class="form-select" asp-items="Html.GetEnumSelectList<KfConstructionWeb.Models.ExpenseCategory>()" required>
+                                    <option value="">-- Select Category --</option>
+                                </select>
+                                <span asp-validation-for="Category" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="PaymentMethod" class="form-label fw-bold"></label>
+                                <select asp-for="PaymentMethod" class="form-select" required>
+                                    <option value="">-- Select Payment Method --</option>
+                                    @if (ViewBag.PaymentMethods != null)
+                                    {
+                                        var paymentMethods = ViewBag.PaymentMethods as string[] ?? Array.Empty<string>();
+                                        @foreach (var method in paymentMethods)
+                                        {
+                                            <option value="@method">@method</option>
+                                        }
+                                    }
+                                </select>
+                                <span asp-validation-for="PaymentMethod" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="CardLastFour" class="form-label fw-bold">
+                                    Card Last 4 Digits (Optional)
+                                </label>
+                                <input asp-for="CardLastFour" class="form-control" maxlength="4" pattern="\d{4}" placeholder="1234" />
+                                <span asp-validation-for="CardLastFour" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ReceiptNumber" class="form-label fw-bold">
+                                Receipt Number (Optional)
+                            </label>
+                            <input asp-for="ReceiptNumber" class="form-control" placeholder="e.g., #12345" />
+                            <span asp-validation-for="ReceiptNumber" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Notes" class="form-label fw-bold">
+                                Notes (Optional)
+                            </label>
+                            <textarea asp-for="Notes" class="form-control" rows="3" placeholder="Additional notes about this expense..."></textarea>
+                            <span asp-validation-for="Notes" class="text-danger"></span>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left me-1"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary" id="submitBtn">
+                                <i class="bi bi-upload me-1"></i>Upload & Process Receipt
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        function previewFile(input) {
+            const file = input.files[0];
+            const preview = document.getElementById('imagePreview');
+            const previewImage = document.getElementById('previewImage');
+            
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            } else {
+                preview.style.display = 'none';
+            }
+        }
+
+        // Show loading state on submit
+        document.getElementById('uploadForm').addEventListener('submit', function() {
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+        });
+    </script>
+}

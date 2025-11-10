@@ -1,0 +1,19 @@
+@{
+    var inputName = ViewData["inputName"]?.ToString() ?? "";
+    var inputType = ViewData["inputType"]?.ToString() ?? "text";
+    var placeholder = ViewData["placeholder"]?.ToString() ?? "";
+    var autocomplete = ViewData["autocomplete"]?.ToString() ?? "";
+    var required = ViewData["required"] is bool reqValue && reqValue;
+    var cssClass = ViewData["cssClass"]?.ToString() ?? "form-control";
+}
+
+<div class="form-floating mb-3">
+    <input name="@inputName" 
+           type="@inputType" 
+           class="@cssClass" 
+           @(string.IsNullOrEmpty(autocomplete) ? "" : $"autocomplete=\"{autocomplete}\"")
+           @(required ? "aria-required=\"true\"" : "")
+           @(string.IsNullOrEmpty(placeholder) ? "" : $"placeholder=\"{placeholder}\"") />
+    <label for="@inputName" class="form-label">@ViewData["label"]</label>
+    <span class="text-danger field-validation-valid" data-valmsg-for="@inputName" data-valmsg-replace="true"></span>
+</div>

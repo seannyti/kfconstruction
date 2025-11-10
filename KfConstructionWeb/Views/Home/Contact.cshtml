@@ -1,0 +1,157 @@
+@model KfConstructionWeb.Models.ViewModels.ContactFormModel
+@{
+    ViewData["Title"] = "Contact Us";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12 text-center mb-5">
+            <h1 class="display-4 fw-bold">Contact Us</h1>
+            <p class="lead text-muted">Get in touch with @(ViewData["SiteTitle"] ?? "our team")</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h3 class="card-title mb-4">
+                        <i class="bi bi-building text-warning me-2"></i>
+                        @(ViewData["CompanyName"] ?? "KF Construction")
+                    </h3>
+                    
+                    @if (!string.IsNullOrEmpty(ViewData["SiteTitle"]?.ToString()))
+                    {
+                        <div class="mb-3">
+                            <h5 class="text-primary">@ViewData["SiteTitle"]</h5>
+                        </div>
+                    }
+                    
+                    @if (!string.IsNullOrEmpty(ViewData["SiteDescription"]?.ToString()))
+                    {
+                        <p class="text-muted mb-4">@ViewData["SiteDescription"]</p>
+                    }
+
+                    <div class="contact-info">
+                        @if (!string.IsNullOrEmpty(ViewData["CompanyEmail"]?.ToString()))
+                        {
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="bi bi-envelope-fill text-warning me-3"></i>
+                                <div>
+                                    <strong>Email</strong><br>
+                                    <a href="mailto:@ViewData["CompanyEmail"]" class="text-decoration-none">@ViewData["CompanyEmail"]</a>
+                                </div>
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrEmpty(ViewData["CompanyPhone"]?.ToString()))
+                        {
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="bi bi-telephone-fill text-warning me-3"></i>
+                                <div>
+                                    <strong>Phone</strong><br>
+                                    <a href="tel:@ViewData["CompanyPhone"]" class="text-decoration-none">@ViewData["CompanyPhone"]</a>
+                                </div>
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrEmpty(ViewData["CompanyAddress"]?.ToString()))
+                        {
+                            <div class="d-flex align-items-start mb-3">
+                                <i class="bi bi-geo-alt-fill text-warning me-3 mt-1"></i>
+                                <div>
+                                    <strong>Address</strong><br>
+                                    <span>@ViewData["CompanyAddress"]</span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h3 class="card-title mb-4">
+                        <i class="bi bi-chat-dots text-warning me-2"></i>
+                        Send us a Message
+                    </h3>
+                    
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="bi bi-check-circle me-2"></i>@TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+                    
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+                    
+                    <form asp-action="Contact" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label">Name</label>
+                            <input asp-for="Name" class="form-control" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label">Email</label>
+                            <input asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Subject" class="form-label">Subject</label>
+                            <input asp-for="Subject" class="form-control" />
+                            <span asp-validation-for="Subject" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Message" class="form-label">Message</label>
+                            <textarea asp-for="Message" class="form-control" rows="5"></textarea>
+                            <span asp-validation-for="Message" class="text-danger"></span>
+                        </div>
+                        <button type="submit" class="btn btn-warning btn-lg w-100">
+                            <i class="bi bi-send me-2"></i>Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-12 text-center">
+            <div class="card border-0 bg-light">
+                <div class="card-body p-4">
+                    <h4 class="mb-3">Business Hours</h4>
+                    <div class="row text-center">
+                        <div class="col-md-6">
+                            <strong>Monday - Friday</strong><br>
+                            <span class="text-muted">8:00 AM - 6:00 PM</span>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Saturday</strong><br>
+                            <span class="text-muted">9:00 AM - 4:00 PM</span>
+                        </div>
+                    </div>
+                    <div class="row text-center mt-2">
+                        <div class="col-12">
+                            <strong>Sunday</strong><br>
+                            <span class="text-muted">Closed</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

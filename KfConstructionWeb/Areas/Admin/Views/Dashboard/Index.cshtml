@@ -1,0 +1,226 @@
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<style>
+    .admin-section {
+        margin-bottom: 3rem;
+    }
+    .admin-section-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e9ecef;
+    }
+    .admin-link {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        background: white;
+        text-decoration: none;
+        color: #212529;
+        transition: all 0.2s ease;
+    }
+    .admin-link:hover {
+        background: #f8f9fa;
+        border-color: #ffc107;
+        color: #212529;
+        transform: translateX(5px);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .admin-link i {
+        font-size: 1.5rem;
+        color: #ffc107;
+        margin-right: 1rem;
+        width: 32px;
+        text-align: center;
+    }
+    .admin-link-content {
+        flex-grow: 1;
+    }
+    .admin-link-title {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+    .admin-link-desc {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin: 0;
+    }
+    .admin-link .bi-chevron-right {
+        font-size: 1rem;
+        color: #adb5bd;
+        margin-right: 0;
+        width: auto;
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-5 mb-2">Admin Dashboard</h1>
+            <p class="text-muted">Managing @(ViewData["CompanyName"] ?? "Knudson Family Construction")</p>
+        </div>
+    </div>
+
+    <!-- Core Management -->
+    <div class="admin-section">
+        <h2 class="admin-section-title">
+            <i class="bi bi-gear-fill me-2"></i>Core Management
+        </h2>
+        <div class="row">
+            <div class="col-lg-6">
+                <a asp-area="Admin" asp-controller="Settings" asp-action="Index" class="admin-link">
+                    <i class="bi bi-sliders"></i>
+                    <div class="admin-link-content">
+                        <div class="admin-link-title">Settings</div>
+                        <p class="admin-link-desc">Configure application settings</p>
+                    </div>
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </div>
+            <div class="col-lg-6">
+                <a asp-area="Admin" asp-controller="Users" asp-action="Index" class="admin-link">
+                    <i class="bi bi-people"></i>
+                    <div class="admin-link-content">
+                        <div class="admin-link-title">User Management</div>
+                        <p class="admin-link-desc">Manage user accounts and roles</p>
+                    </div>
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content & Communication -->
+    <div class="admin-section">
+        <h2 class="admin-section-title">
+            <i class="bi bi-megaphone-fill me-2"></i>Communication
+        </h2>
+        <div class="row">
+            <div class="col-lg-6">
+                <a asp-area="Admin" asp-controller="Broadcast" asp-action="Index" class="admin-link">
+                    <i class="bi bi-megaphone"></i>
+                    <div class="admin-link-content">
+                        <div class="admin-link-title">Broadcast Messaging</div>
+                        <p class="admin-link-desc">Send announcements to users</p>
+                    </div>
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </div>
+            <div class="col-lg-6">
+                <a asp-area="" asp-controller="Testimonials" asp-action="Manage" class="admin-link">
+                    <i class="bi bi-chat-heart"></i>
+                    <div class="admin-link-content">
+                        <div class="admin-link-title">Testimonials</div>
+                        <p class="admin-link-desc">Manage customer reviews</p>
+                    </div>
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </div>
+            <div class="col-lg-6">
+                <a asp-area="Admin" asp-controller="EmailLogs" asp-action="Index" class="admin-link">
+                    <i class="bi bi-envelope"></i>
+                    <div class="admin-link-content">
+                        <div class="admin-link-title">Email Logs</div>
+                        <p class="admin-link-desc">View email delivery logs</p>
+                    </div>
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- File & Document Management -->
+    <div class="admin-section">
+        <h2 class="admin-section-title">
+            <i class="bi bi-folder-fill me-2"></i>File & Document Management
+        </h2>
+        <div class="row">
+            <div class="col-lg-6">
+                <a asp-area="Admin" asp-controller="Files" asp-action="Index" class="admin-link">
+                    <i class="bi bi-folder2-open"></i>
+                    <div class="admin-link-content">
+                        <div class="admin-link-title">File Manager</div>
+                        <p class="admin-link-desc">Upload and organize files</p>
+                    </div>
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </div>
+            <div class="col-lg-6">
+                <a asp-area="Admin" asp-controller="Receipts" asp-action="Index" class="admin-link">
+                    <i class="bi bi-receipt-cutoff"></i>
+                    <div class="admin-link-content">
+                        <div class="admin-link-title">Receipts</div>
+                        <p class="admin-link-desc">Manage receipts with AI OCR</p>
+                    </div>
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- System & Monitoring -->
+    <div class="admin-section">
+        <h2 class="admin-section-title">
+            <i class="bi bi-speedometer2 me-2"></i>System & Monitoring
+        </h2>
+        <div class="row">
+            <div class="col-lg-6">
+                <a asp-area="Admin" asp-controller="Monitoring" asp-action="Index" class="admin-link">
+                    <i class="bi bi-graph-up"></i>
+                    <div class="admin-link-content">
+                        <div class="admin-link-title">System Monitoring</div>
+                        <p class="admin-link-desc">Health checks and performance</p>
+                    </div>
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </div>
+            <div class="col-lg-6">
+                <a asp-area="Admin" asp-controller="Activity" asp-action="Index" class="admin-link">
+                    <i class="bi bi-clock-history"></i>
+                    <div class="admin-link-content">
+                        <div class="admin-link-title">Activity Logs</div>
+                        <p class="admin-link-desc">View system activity and audit trail</p>
+                    </div>
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </div>
+            <div class="col-lg-6">
+                <a asp-area="Admin" asp-controller="Tasks" asp-action="Index" class="admin-link">
+                    <i class="bi bi-calendar2-event"></i>
+                    <div class="admin-link-content">
+                        <div class="admin-link-title">Scheduled Tasks</div>
+                        <p class="admin-link-desc">Background job runs & schedule</p>
+                    </div>
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </div>
+            <div class="col-lg-6">
+                <a asp-area="Admin" asp-controller="Backup" asp-action="Index" class="admin-link">
+                    <i class="bi bi-database"></i>
+                    <div class="admin-link-content">
+                        <div class="admin-link-title">Database Backup</div>
+                        <p class="admin-link-desc">Azure SQL automatic backups</p>
+                    </div>
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </div>
+            <div class="col-lg-6">
+                <a asp-area="Admin" asp-controller="ApiKeys" asp-action="Index" class="admin-link">
+                    <i class="bi bi-key"></i>
+                    <div class="admin-link-content">
+                        <div class="admin-link-title">API Keys</div>
+                        <p class="admin-link-desc">Manage API access tokens</p>
+                    </div>
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

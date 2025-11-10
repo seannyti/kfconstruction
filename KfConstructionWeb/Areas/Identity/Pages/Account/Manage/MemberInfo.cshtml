@@ -1,0 +1,68 @@
+@page
+@model MemberInfoModel
+@{
+    ViewData["Title"] = "Member Information";
+    ViewData["ActivePage"] = "MemberInfo";
+}
+
+<h3>@ViewData["Title"]</h3>
+
+@if (!string.IsNullOrEmpty(Model.StatusMessage))
+{
+    <div class="alert alert-info" role="alert">
+        @Model.StatusMessage
+    </div>
+}
+
+@if (Model.Member != null)
+{
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Member Profile</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <dl class="row">
+                        <dt class="col-sm-4">Member ID:</dt>
+                        <dd class="col-sm-8">@Model.Member.Id</dd>
+                        
+                        <dt class="col-sm-4">Name:</dt>
+                        <dd class="col-sm-8">@Model.Member.Name</dd>
+                        
+                        <dt class="col-sm-4">Email:</dt>
+                        <dd class="col-sm-8">@Model.Member.Email</dd>
+                        
+                        <dt class="col-sm-4">Status:</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.Member.IsActive)
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Inactive</span>
+                            }
+                        </dd>
+                        
+                        <dt class="col-sm-4">Member Since:</dt>
+                        <dd class="col-sm-8">@Model.Member.CreatedAt.ToString("MMM dd, yyyy")</dd>
+                    </dl>
+                </div>
+                <div class="col-md-6">
+                    <div class="alert alert-info">
+                        <h6>Admin Note</h6>
+                        <p class="mb-0">This information is synced with the member database. Only administrators can view member details.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-warning">
+        <h6>No Member Record</h6>
+        <p class="mb-0">This user account is not associated with a member record in the system.</p>
+    </div>
+}

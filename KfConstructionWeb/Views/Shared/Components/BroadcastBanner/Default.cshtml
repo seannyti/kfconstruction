@@ -1,0 +1,20 @@
+@model KfConstructionWeb.Models.BroadcastMessage
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <div class="d-flex align-items-start">
+        <div class="me-2">
+            <i class="bi bi-megaphone-fill fs-4"></i>
+        </div>
+        <div class="flex-grow-1">
+            <h5 class="mb-1">@Model.Subject</h5>
+            <div>@Html.Raw(Model.Message)</div>
+            <small class="text-muted">Sent @Model.SentAt.ToLocalTime().ToString("g")</small>
+        </div>
+        <form asp-area="Admin" asp-controller="Broadcast" asp-action="Dismiss" method="post" class="ms-3">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@Model.Id" />
+            <button type="submit" class="btn btn-sm btn-outline-secondary" title="Dismiss">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </form>
+    </div>
+</div>

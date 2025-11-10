@@ -1,0 +1,295 @@
+/* Testimonials Page Styles */
+
+/* Testimonial Cards */
+.testimonial-card {
+    position: relative;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.testimonial-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.testimonial-card.animate-in {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.testimonial-card.animate-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Featured Badge */
+.featured-badge {
+    z-index: 10;
+    margin: 10px;
+}
+
+/* Rating Overview */
+.rating-overview {
+    background: linear-gradient(135deg, var(--bs-primary) 0%, var(--bs-primary-dark) 100%);
+}
+
+.rating-bar .progress {
+    height: 8px;
+}
+
+/* Client Photos */
+.client-photo {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Filter Buttons */
+.filter-buttons .btn {
+    border-radius: 20px;
+}
+
+/* Quote Styling */
+blockquote p {
+    font-style: italic;
+    line-height: 1.6;
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+}
+
+/* Progress Bar Width (Dynamic) - width set via inline style for percentage */
+
+/* Testimonials Management Styles */
+.status-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+}
+
+.admin-photo {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+}
+
+.display-order-input {
+    width: 80px;
+}
+
+/* Submit Form Styles */
+.hero-section.submit-hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.rating-input {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+}
+
+.rating-radio {
+    display: none;
+}
+
+.rating-star {
+    font-size: 2rem;
+    color: #ddd;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    margin-right: 0.25rem;
+}
+
+.rating-star:hover,
+.rating-star:hover ~ .rating-star {
+    color: #ffc107;
+}
+
+.rating-radio:checked ~ .rating-star {
+    color: #ffc107;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.submit-card {
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.submit-card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+.feature-icon {
+    width: 80px;
+    height: 80px;
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.form-control-lg {
+    border-radius: 10px;
+}
+
+.btn-lg {
+    border-radius: 10px;
+    padding: 12px 30px;
+}
+
+.honeypot-field {
+    display: none !important;
+}
+
+.char-count {
+    font-size: 0.875rem;
+}
+
+.char-count.warning {
+    color: #ffc107;
+}
+
+.char-count.danger {
+    color: #dc3545;
+}
+
+.content-hint {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+}
+
+/* Rating Stars */
+.rating-stars {
+    color: #ffc107;
+}
+
+.rating-stars.interactive {
+    cursor: pointer;
+}
+
+.rating-stars.interactive:hover {
+    color: #ffcd39;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .testimonial-card {
+        margin-bottom: 1.5rem;
+    }
+    
+    .filter-buttons .btn {
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+    }
+    
+    .client-photo {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero-section h1 {
+        font-size: 2rem !important;
+    }
+    
+    .filter-buttons {
+        text-align: center;
+    }
+    
+    .filter-buttons .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* Management page specific styles */
+.status-badge {
+    font-size: 0.875rem;
+    padding: 0.375rem 0.75rem;
+}
+
+.admin-actions .btn {
+    margin: 0.125rem;
+}
+
+.quick-stats .card {
+    border: none;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.display-order-input {
+    width: 80px !important;
+    display: inline-flex !important;
+}
+
+/* Featured testimonials specific styles */
+.featured-testimonials .testimonial-card {
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.featured-testimonials .testimonial-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important;
+}
+
+.featured-testimonials .testimonial-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(135deg, var(--bs-primary), var(--bs-warning));
+    transition: width 0.3s ease;
+}
+
+.featured-testimonials .testimonial-card:hover::before {
+    width: 6px;
+}
+
+.featured-testimonials .client-avatar {
+    border: 3px solid #fff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.featured-testimonials .rating-summary {
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+.featured-testimonials .cta-section {
+    background: linear-gradient(135deg, var(--bs-primary) 0%, #4c6ef5 100%);
+}
+
+.featured-testimonials blockquote p {
+    line-height: 1.6;
+    font-size: 1.1rem;
+}
+
+.featured-testimonials .quote-icon {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+}
+
+@media (max-width: 768px) {
+    .featured-testimonials .d-flex.gap-3 {
+        flex-direction: column;
+    }
+    
+    .featured-testimonials .btn {
+        width: 100%;
+    }
+}

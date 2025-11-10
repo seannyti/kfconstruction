@@ -1,0 +1,260 @@
+@model KfConstructionWeb.Models.ViewModels.SettingsViewModel
+@{
+    ViewData["Title"] = "Admin Settings";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="display-5">
+                        <i class="bi bi-gear-fill me-3"></i>Admin Settings
+                    </h1>
+                    <p class="text-muted mb-0">Configure settings for <strong>@(ViewData["SiteTitle"] ?? "KF Construction Management")</strong></p>
+                </div>
+                <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+                </a>
+            </div>
+
+            <form asp-action="Index" method="post">
+                <div class="card">
+                    <div class="card-header">
+                        <ul class="nav nav-tabs card-header-tabs" id="settingsTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="general-tab" data-bs-toggle="tab" data-bs-target="#general" type="button" role="tab">
+                                    <i class="bi bi-building me-2"></i>General
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="security-tab" data-bs-toggle="tab" data-bs-target="#security" type="button" role="tab">
+                                    <i class="bi bi-shield-lock me-2"></i>Security
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="email-tab" data-bs-toggle="tab" data-bs-target="#email" type="button" role="tab">
+                                    <i class="bi bi-envelope me-2"></i>Email
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="maintenance-tab" data-bs-toggle="tab" data-bs-target="#maintenance" type="button" role="tab">
+                                    <i class="bi bi-tools me-2"></i>Maintenance
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="tab-content" id="settingsTabContent">
+                            
+                            <!-- General Settings Tab -->
+                            <div class="tab-pane fade show active" id="general" role="tabpanel">
+                                <h5 class="mb-3">Company Information</h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label asp-for="General.CompanyName" class="form-label"></label>
+                                            <input asp-for="General.CompanyName" class="form-control" />
+                                            <span asp-validation-for="General.CompanyName" class="text-danger"></span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label asp-for="General.CompanyEmail" class="form-label"></label>
+                                            <input asp-for="General.CompanyEmail" class="form-control" />
+                                            <span asp-validation-for="General.CompanyEmail" class="text-danger"></span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label asp-for="General.CompanyPhone" class="form-label"></label>
+                                            <input asp-for="General.CompanyPhone" class="form-control" />
+                                            <span asp-validation-for="General.CompanyPhone" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label asp-for="General.SiteTitle" class="form-label"></label>
+                                            <input asp-for="General.SiteTitle" class="form-control" />
+                                            <span asp-validation-for="General.SiteTitle" class="text-danger"></span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label asp-for="General.CompanyAddress" class="form-label"></label>
+                                            <textarea asp-for="General.CompanyAddress" class="form-control" rows="3"></textarea>
+                                            <span asp-validation-for="General.CompanyAddress" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label asp-for="General.SiteDescription" class="form-label"></label>
+                                    <textarea asp-for="General.SiteDescription" class="form-control" rows="3"></textarea>
+                                    <span asp-validation-for="General.SiteDescription" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <!-- Security Settings Tab -->
+                            <div class="tab-pane fade" id="security" role="tabpanel">
+                                <h5 class="mb-3">Authentication & Security</h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <div class="form-check">
+                                                <input asp-for="Security.RequireEmailConfirmation" class="form-check-input" />
+                                                <label asp-for="Security.RequireEmailConfirmation" class="form-check-label"></label>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="form-check">
+                                                <input asp-for="Security.EnableTwoFactorAuth" class="form-check-input" />
+                                                <label asp-for="Security.EnableTwoFactorAuth" class="form-check-label"></label>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="form-check">
+                                                <input asp-for="Security.RequirePasswordSpecialChars" class="form-check-input" />
+                                                <label asp-for="Security.RequirePasswordSpecialChars" class="form-check-label"></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label asp-for="Security.SessionTimeoutMinutes" class="form-label"></label>
+                                            <input asp-for="Security.SessionTimeoutMinutes" class="form-control" type="number" min="5" max="1440" />
+                                            <span asp-validation-for="Security.SessionTimeoutMinutes" class="text-danger"></span>
+                                            <div class="form-text">Minutes before user session expires</div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label asp-for="Security.PasswordMinLength" class="form-label"></label>
+                                            <input asp-for="Security.PasswordMinLength" class="form-control" type="number" min="6" max="20" />
+                                            <span asp-validation-for="Security.PasswordMinLength" class="text-danger"></span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label asp-for="Security.MaxLoginAttempts" class="form-label"></label>
+                                            <input asp-for="Security.MaxLoginAttempts" class="form-control" type="number" min="3" max="10" />
+                                            <span asp-validation-for="Security.MaxLoginAttempts" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Email Settings Tab -->
+                            <div class="tab-pane fade" id="email" role="tabpanel">
+                                <div class="alert alert-info mb-4">
+                                    <i class="bi bi-info-circle me-2"></i>
+                                    <strong>Enable Emails</strong> must be ON for emails to actually be sent. When OFF, emails are logged but not sent (useful for testing).
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded">
+                                        <div>
+                                            <h5 class="mb-1">
+                                                <i class="bi bi-power me-2"></i>Email System Status
+                                            </h5>
+                                            <p class="text-muted mb-0 small">Toggle email sending on or off</p>
+                                        </div>
+                                        <div class="form-check form-switch" style="font-size: 1.5rem;">
+                                            <input asp-for="Email.EnableEmails" class="form-check-input" role="switch" id="enableEmailsSwitch" />
+                                            <label class="form-check-label" for="enableEmailsSwitch"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <h5 class="mb-3">SMTP Configuration</h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label asp-for="Email.SmtpServer" class="form-label"></label>
+                                            <input asp-for="Email.SmtpServer" class="form-control" placeholder="smtp.gmail.com" />
+                                            <span asp-validation-for="Email.SmtpServer" class="text-danger"></span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label asp-for="Email.SmtpPort" class="form-label"></label>
+                                            <input asp-for="Email.SmtpPort" class="form-control" type="number" min="1" max="65535" />
+                                            <span asp-validation-for="Email.SmtpPort" class="text-danger"></span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label asp-for="Email.SmtpUsername" class="form-label"></label>
+                                            <input asp-for="Email.SmtpUsername" class="form-control" />
+                                            <span asp-validation-for="Email.SmtpUsername" class="text-danger"></span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label asp-for="Email.SmtpPassword" class="form-label"></label>
+                                            <input asp-for="Email.SmtpPassword" class="form-control" type="password" />
+                                            <span asp-validation-for="Email.SmtpPassword" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <div class="form-check">
+                                                <input asp-for="Email.UseSSL" class="form-check-input" />
+                                                <label asp-for="Email.UseSSL" class="form-check-label"></label>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label asp-for="Email.FromEmail" class="form-label"></label>
+                                            <input asp-for="Email.FromEmail" class="form-control" />
+                                            <span asp-validation-for="Email.FromEmail" class="text-danger"></span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label asp-for="Email.FromDisplayName" class="form-label"></label>
+                                            <input asp-for="Email.FromDisplayName" class="form-control" />
+                                            <span asp-validation-for="Email.FromDisplayName" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Maintenance Settings Tab -->
+                            <div class="tab-pane fade" id="maintenance" role="tabpanel">
+                                <h5 class="mb-3">System Maintenance</h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <div class="form-check">
+                                                <input asp-for="Maintenance.MaintenanceMode" class="form-check-input" />
+                                                <label asp-for="Maintenance.MaintenanceMode" class="form-check-label"></label>
+                                            </div>
+                                            <div class="form-text">When enabled, only admins can access the site</div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="form-check">
+                                                <input asp-for="Maintenance.EnableUserRegistration" class="form-check-input" />
+                                                <label asp-for="Maintenance.EnableUserRegistration" class="form-check-label"></label>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="form-check">
+                                                <input asp-for="Maintenance.EnableApiAccess" class="form-check-input" />
+                                                <label asp-for="Maintenance.EnableApiAccess" class="form-check-label"></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label asp-for="Maintenance.MaintenanceMessage" class="form-label"></label>
+                                            <textarea asp-for="Maintenance.MaintenanceMessage" class="form-control" rows="4" placeholder="We're performing scheduled maintenance. Please check back later."></textarea>
+                                            <span asp-validation-for="Maintenance.MaintenanceMessage" class="text-danger"></span>
+                                            <div class="form-text">Message shown to users when maintenance mode is enabled</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer">
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-outline-secondary" onclick="history.back()">
+                                <i class="bi bi-arrow-left me-2"></i>Cancel
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle me-2"></i>Save Settings
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

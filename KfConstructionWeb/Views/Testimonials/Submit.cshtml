@@ -1,0 +1,221 @@
+@model Testimonial
+@{
+    ViewData["Title"] = "Submit Your Testimonial";
+    ViewData["Description"] = "Share your experience working with KF Construction. Your feedback helps us improve and helps other clients make informed decisions.";
+}
+
+<div class="submit-testimonial-page">
+    <!-- Hero Section -->
+    <section class="hero-section bg-gradient py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 text-center">
+                    <h1 class="display-5 fw-bold text-white mb-3">Share Your Experience</h1>
+                    <p class="lead text-white mb-4">
+                        We value your feedback! Tell us about your experience working with KF Construction 
+                        and help other clients learn about our services.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Form Section -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card shadow-lg border-0">
+                        <div class="card-header bg-primary text-white py-4">
+                            <h3 class="mb-0 text-center">
+                                <i class="fas fa-star me-2"></i>Submit Your Testimonial
+                            </h3>
+                        </div>
+                        <div class="card-body p-4">
+                            <form asp-action="Submit" method="post" novalidate id="testimonialForm">
+                                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                                <!-- Honeypot field (hidden spam trap) -->
+                                <input type="text" name="honeypot" class="honeypot-field" tabindex="-1" autocomplete="off" />
+                                
+                                <!-- Timestamp for timing validation -->
+                                <input type="hidden" name="timestamp" id="timestamp" />
+
+                                <div class="row">
+                                    <!-- Personal Information -->
+                                    <div class="col-md-6">
+                                        <h5 class="mb-3 text-primary">
+                                            <i class="fas fa-user me-2"></i>Your Information
+                                        </h5>
+                                        
+                                        <div class="mb-3">
+                                            <label asp-for="Name" class="form-label fw-bold">Full Name *</label>
+                                            <input asp-for="Name" class="form-control form-control-lg" placeholder="Enter your full name" />
+                                            <span asp-validation-for="Name" class="text-danger"></span>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label asp-for="Email" class="form-label fw-bold">Email Address</label>
+                                            <input asp-for="Email" class="form-control" placeholder="your.email@example.com" />
+                                            <span asp-validation-for="Email" class="text-danger"></span>
+                                            <div class="form-text">Optional - will not be displayed publicly</div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label asp-for="Company" class="form-label fw-bold">Company Name</label>
+                                            <input asp-for="Company" class="form-control" placeholder="Your company name (optional)" />
+                                            <span asp-validation-for="Company" class="text-danger"></span>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label asp-for="JobTitle" class="form-label fw-bold">Job Title</label>
+                                            <input asp-for="JobTitle" class="form-control" placeholder="Your position (optional)" />
+                                            <span asp-validation-for="JobTitle" class="text-danger"></span>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label asp-for="Location" class="form-label fw-bold">Location</label>
+                                            <input asp-for="Location" class="form-control" placeholder="City, State (optional)" />
+                                            <span asp-validation-for="Location" class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Review Information -->
+                                    <div class="col-md-6">
+                                        <h5 class="mb-3 text-primary">
+                                            <i class="fas fa-comment-dots me-2"></i>Your Review
+                                        </h5>
+
+                                        <div class="mb-3">
+                                            <label asp-for="Rating" class="form-label fw-bold">Overall Rating *</label>
+                                            <div class="rating-input mb-2">
+                                                @for (int i = 5; i >= 1; i--)
+                                                {
+                                                    <input type="radio" asp-for="Rating" value="@i" id="star@(i)" class="rating-radio" />
+                                                    <label for="star@(i)" class="rating-star" title="@i Star@(i != 1 ? "s" : "")">
+                                                        <i class="fas fa-star"></i>
+                                                    </label>
+                                                }
+                                            </div>
+                                            <span asp-validation-for="Rating" class="text-danger"></span>
+                                            <div class="form-text">Click to rate your experience</div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label asp-for="ServiceType" class="form-label fw-bold">Service Type</label>
+                                            <select asp-for="ServiceType" class="form-select" asp-items="Html.GetEnumSelectList<ServiceType>()">
+                                                <option value="">Select service type (optional)</option>
+                                            </select>
+                                            <span asp-validation-for="ServiceType" class="text-danger"></span>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label asp-for="PhotoUrl" class="form-label fw-bold">Profile Photo URL</label>
+                                            <input asp-for="PhotoUrl" class="form-control" placeholder="https://example.com/photo.jpg (optional)" />
+                                            <span asp-validation-for="PhotoUrl" class="text-danger"></span>
+                                            <div class="form-text">Optional - link to your profile photo</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Testimonial Content -->
+                                <div class="row mt-4">
+                                    <div class="col-12">
+                                        <h5 class="mb-3 text-primary">
+                                            <i class="fas fa-quote-left me-2"></i>Your Testimonial
+                                        </h5>
+                                        
+                                        <div class="mb-4">
+                                            <label asp-for="Content" class="form-label fw-bold">Tell us about your experience *</label>
+                                            <textarea asp-for="Content" class="form-control" rows="6" 
+                                                      placeholder="Share your experience working with KF Construction. What did you like most? How was the quality of work? Would you recommend us to others?"></textarea>
+                                            <span asp-validation-for="Content" class="text-danger"></span>
+                                            <div class="form-text">
+                                                <span id="char-count">0</span>/2000 characters
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Disclaimer -->
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="alert alert-info">
+                                            <h6 class="alert-heading">
+                                                <i class="fas fa-info-circle me-2"></i>Review Process
+                                            </h6>
+                                            <p class="mb-0">
+                                                Your testimonial will be reviewed before being published. We review all submissions 
+                                                to ensure they meet our community guidelines. You'll be notified once your testimonial is live.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Submit Button -->
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                            <a href="@Url.Action("Index")" class="btn btn-outline-secondary btn-lg me-md-2">
+                                                <i class="fas fa-arrow-left me-2"></i>Cancel
+                                            </a>
+                                            <button type="submit" class="btn btn-primary btn-lg">
+                                                <i class="fas fa-paper-plane me-2"></i>Submit Testimonial
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Reviews Matter Section -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="text-center mb-5">
+                        <h3 class="fw-bold">Why Your Review Matters</h3>
+                        <p class="text-muted">Your feedback helps us improve and helps other clients make informed decisions</p>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 text-center mb-4">
+                            <div class="feature-icon mb-3">
+                                <i class="fas fa-heart fa-2x text-danger"></i>
+                            </div>
+                            <h5>Help Others</h5>
+                            <p class="text-muted">Your experience helps future clients choose the right contractor for their project.</p>
+                        </div>
+                        <div class="col-md-4 text-center mb-4">
+                            <div class="feature-icon mb-3">
+                                <i class="fas fa-chart-line fa-2x text-success"></i>
+                            </div>
+                            <h5>Improve Service</h5>
+                            <p class="text-muted">Your feedback helps us continuously improve our services and processes.</p>
+                        </div>
+                        <div class="col-md-4 text-center mb-4">
+                            <div class="feature-icon mb-3">
+                                <i class="fas fa-handshake fa-2x text-primary"></i>
+                            </div>
+                            <h5>Build Trust</h5>
+                            <p class="text-muted">Honest reviews build trust and transparency in our community.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/testimonials.css" />
+}
+
+@section Scripts {
+    <script src="~/js/testimonials.js"></script>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

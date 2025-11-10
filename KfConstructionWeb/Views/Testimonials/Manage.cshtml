@@ -1,0 +1,346 @@
+@model IEnumerable<Testimonial>
+@{
+    ViewData["Title"] = "Manage Testimonials";
+    var filterStatus = ViewBag.FilterStatus as TestimonialStatus?;
+    var pendingCount = Model.Count(t => t.Status == TestimonialStatus.Pending);
+    var approvedCount = Model.Count(t => t.Status == TestimonialStatus.Approved);
+    var rejectedCount = Model.Count(t => t.Status == TestimonialStatus.Rejected);
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/testimonials.css" />
+}
+
+<div class="manage-testimonials-page">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Manage Testimonials</h1>
+            <p class="text-muted mb-0">Review and manage client testimonials</p>
+        </div>
+        <div>
+            <a href="@Url.Action("Index")" class="btn btn-outline-primary me-2">
+                <i class="fas fa-eye me-1"></i>View Public Page
+            </a>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row mb-4 quick-stats">
+        <div class="col-md-3 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <div class="text-warning mb-2">
+                        <i class="fas fa-clock fa-2x"></i>
+                    </div>
+                    <h4 class="fw-bold">@pendingCount</h4>
+                    <p class="text-muted mb-0">Pending Review</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <div class="text-success mb-2">
+                        <i class="fas fa-check-circle fa-2x"></i>
+                    </div>
+                    <h4 class="fw-bold">@approvedCount</h4>
+                    <p class="text-muted mb-0">Approved</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <div class="text-danger mb-2">
+                        <i class="fas fa-times-circle fa-2x"></i>
+                    </div>
+                    <h4 class="fw-bold">@rejectedCount</h4>
+                    <p class="text-muted mb-0">Rejected</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <div class="text-primary mb-2">
+                        <i class="fas fa-comments fa-2x"></i>
+                    </div>
+                    <h4 class="fw-bold">@Model.Count()</h4>
+                    <p class="text-muted mb-0">Total</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h6 class="mb-3 mb-md-0">Filter by Status:</h6>
+                    <div class="btn-group" role="group">
+                        <a href="@Url.Action("Manage")" 
+                           class="btn @(filterStatus == null ? "btn-primary" : "btn-outline-primary")">
+                            All (@Model.Count())
+                        </a>
+                        <a href="@Url.Action("Manage", new { status = TestimonialStatus.Pending })" 
+                           class="btn @(filterStatus == TestimonialStatus.Pending ? "btn-warning" : "btn-outline-warning")">
+                            Pending (@pendingCount)
+                        </a>
+                        <a href="@Url.Action("Manage", new { status = TestimonialStatus.Approved })" 
+                           class="btn @(filterStatus == TestimonialStatus.Approved ? "btn-success" : "btn-outline-success")">
+                            Approved (@approvedCount)
+                        </a>
+                        <a href="@Url.Action("Manage", new { status = TestimonialStatus.Rejected })" 
+                           class="btn @(filterStatus == TestimonialStatus.Rejected ? "btn-danger" : "btn-outline-danger")">
+                            Rejected (@rejectedCount)
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-6 text-end">
+                    <small class="text-muted">
+                        Last updated: @DateTime.Now.ToString("MMM dd, yyyy HH:mm")
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Testimonials List -->
+    @if (Model.Any())
+    {
+        <div class="row">
+            @foreach (var testimonial in Model.OrderByDescending(t => t.SubmittedAt))
+            {
+                <div class="col-lg-6 col-xl-4 mb-4">
+                    <div class="card testimonial-card h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <div>
+                                <!-- Status Badge -->
+                                @switch (testimonial.Status)
+                                {
+                                    case TestimonialStatus.Pending:
+                                        <span class="badge bg-warning text-dark status-badge">
+                                            <i class="fas fa-clock me-1"></i>Pending
+                                        </span>
+                                        break;
+                                    case TestimonialStatus.Approved:
+                                        <span class="badge bg-success status-badge">
+                                            <i class="fas fa-check me-1"></i>Approved
+                                        </span>
+                                        break;
+                                    case TestimonialStatus.Rejected:
+                                        <span class="badge bg-danger status-badge">
+                                            <i class="fas fa-times me-1"></i>Rejected
+                                        </span>
+                                        break;
+                                    case TestimonialStatus.Flagged:
+                                        <span class="badge bg-warning status-badge">
+                                            <i class="fas fa-flag me-1"></i>Flagged
+                                        </span>
+                                        break;
+                                    case TestimonialStatus.Archived:
+                                        <span class="badge bg-secondary status-badge">
+                                            <i class="fas fa-archive me-1"></i>Archived
+                                        </span>
+                                        break;
+                                }
+
+                                @if (testimonial.IsFeatured)
+                                {
+                                    <span class="badge bg-primary status-badge ms-1">
+                                        <i class="fas fa-star me-1"></i>Featured
+                                    </span>
+                                }
+                            </div>
+                            <small class="text-muted">ID: @testimonial.Id</small>
+                        </div>
+
+                        <div class="card-body">
+                            <!-- Client Info -->
+                            <div class="d-flex align-items-center mb-3">
+                                @if (!string.IsNullOrEmpty(testimonial.PhotoUrl))
+                                {
+                                    <img src="@testimonial.PhotoUrl" alt="@testimonial.Name" 
+                                         class="rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover;">
+                                }
+                                <div>
+                                    <h6 class="mb-0 fw-bold">@testimonial.DisplayName</h6>
+                                    @if (!string.IsNullOrEmpty(testimonial.Email))
+                                    {
+                                        <small class="text-muted">@testimonial.Email</small>
+                                    }
+                                    @if (!string.IsNullOrEmpty(testimonial.Location))
+                                    {
+                                        <div><small class="text-muted">📍 @testimonial.Location</small></div>
+                                    }
+                                </div>
+                            </div>
+
+                            <!-- Rating -->
+                            <div class="rating-stars mb-2">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    <i class="fas fa-star @(i <= testimonial.Rating ? "" : "text-muted")"></i>
+                                }
+                                <span class="ms-2 text-muted">(@testimonial.Rating/5)</span>
+                            </div>
+
+                            <!-- Service Type -->
+                            @if (testimonial.ServiceType.HasValue)
+                            {
+                                <div class="mb-2">
+                                    <span class="badge bg-light text-dark">
+                                        @(testimonial.ServiceType?.ToString().Replace("_", " ") ?? string.Empty)
+                                    </span>
+                                </div>
+                            }
+
+                            <!-- Content Preview -->
+                            <div class="mb-3">
+                                <p class="card-text">
+                                    @if (testimonial.Content.Length > 150)
+                                    {
+                                        @($"{testimonial.Content.Substring(0, 150)}...")
+                                    }
+                                    else
+                                    {
+                                        @testimonial.Content
+                                    }
+                                </p>
+                            </div>
+
+                            <!-- Metadata -->
+                            <div class="mb-3">
+                                <small class="text-muted">
+                                    <strong>Submitted:</strong> @testimonial.SubmittedAt.ToString("MMM dd, yyyy HH:mm")<br>
+                                    @if (testimonial.PublishedAt.HasValue)
+                                    {
+                                        <strong>Published:</strong> @testimonial.PublishedAt.Value.ToString("MMM dd, yyyy HH:mm")<br>
+                                    }
+                                    @if (testimonial.ServiceType.HasValue)
+                                    {
+                                        <strong>Service:</strong> @testimonial.ServiceType.Value.ToString()<br>
+                                    }
+                                    @if (!string.IsNullOrEmpty(testimonial.IPAddress))
+                                    {
+                                        <strong>IP:</strong> @testimonial.IPAddress
+                                    }
+                                </small>
+                            </div>
+
+                            <!-- Admin Notes -->
+                            @if (!string.IsNullOrEmpty(testimonial.AdminNotes))
+                            {
+                                <div class="alert alert-info py-2">
+                                    <small><strong>Admin Notes:</strong> @testimonial.AdminNotes</small>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Admin Actions -->
+                        <div class="card-footer bg-light">
+                            <div class="admin-actions">
+                                @if (testimonial.Status == TestimonialStatus.Pending)
+                                {
+                                    <form asp-action="UpdateStatus" method="post" class="d-inline">
+                                        <input type="hidden" name="id" value="@testimonial.Id" />
+                                        <input type="hidden" name="status" value="@((int)TestimonialStatus.Approved)" />
+                                        <button type="submit" class="btn btn-success btn-sm" title="Approve">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    </form>
+                                    <form asp-action="UpdateStatus" method="post" class="d-inline">
+                                        <input type="hidden" name="id" value="@testimonial.Id" />
+                                        <input type="hidden" name="status" value="@((int)TestimonialStatus.Rejected)" />
+                                        <button type="submit" class="btn btn-danger btn-sm" title="Reject">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </form>
+                                }
+
+                                @if (testimonial.Status == TestimonialStatus.Approved)
+                                {
+                                    <form asp-action="ToggleFeatured" method="post" class="d-inline">
+                                        <input type="hidden" name="id" value="@testimonial.Id" />
+                                        <button type="submit" class="btn @(testimonial.IsFeatured ? "btn-warning" : "btn-outline-warning") btn-sm" 
+                                                title="@(testimonial.IsFeatured ? "Remove from Featured" : "Make Featured")">
+                                            <i class="fas fa-star"></i>
+                                        </button>
+                                    </form>
+                                }
+
+                                <!-- Display Order -->
+                                @if (testimonial.Status == TestimonialStatus.Approved)
+                                {
+                                    <div class="input-group input-group-sm d-inline-flex" style="width: 80px;">
+                                        <input type="number" class="form-control form-control-sm display-order-input" 
+                                               value="@testimonial.DisplayOrder" 
+                                               data-testimonial-id="@testimonial.Id"
+                                               min="0" max="999" title="Display Order">
+                                    </div>
+                                }
+
+                                <!-- Archive/Delete -->
+                                <div class="dropdown d-inline">
+                                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" 
+                                            data-bs-toggle="dropdown">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <form asp-action="Archive" method="post">
+                                                <input type="hidden" name="id" value="@testimonial.Id" />
+                                                <button type="submit" class="dropdown-item text-warning" 
+                                                        onclick="return confirm('Archive this testimonial?')">
+                                                    <i class="fas fa-archive me-2"></i>Archive
+                                                </button>
+                                            </form>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <form asp-action="Delete" method="post">
+                                                <input type="hidden" name="id" value="@testimonial.Id" />
+                                                <button type="submit" class="dropdown-item text-danger" 
+                                                        onclick="return confirm('Permanently delete this testimonial? This action cannot be undone.')">
+                                                    <i class="fas fa-trash me-2"></i>Delete
+                                                </button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <div class="mb-4">
+                <i class="fas fa-comment-dots fa-3x text-muted"></i>
+            </div>
+            <h4 class="text-muted">No Testimonials Found</h4>
+            <p class="text-muted">
+                @if (filterStatus.HasValue)
+                {
+                    <text>No testimonials with status "@filterStatus" found.</text>
+                }
+                else
+                {
+                    <text>No testimonials have been submitted yet.</text>
+                }
+            </p>
+            <a href="@Url.Action("Index")" class="btn btn-primary">
+                <i class="fas fa-eye me-2"></i>View Public Testimonials Page
+            </a>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="~/js/testimonials.js"></script>
+}

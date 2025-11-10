@@ -1,0 +1,90 @@
+@model KfConstructionWeb.Models.ViewModels.LockAccountViewModel
+@{
+    ViewData["Title"] = "Lock Account";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">
+                            <i class="bi bi-lock-fill me-2"></i>Lock User Account
+                        </h4>
+                        <a asp-area="Admin" asp-controller="Users" asp-action="ViewProfile" asp-route-id="@Model.UserId" class="btn btn-outline-dark btn-sm">
+                            <i class="bi bi-arrow-left"></i> Back to Profile
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <strong>Warning:</strong> This will prevent the user from accessing the system.
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>User:</strong> @Model.UserEmail
+                    </div>
+
+                    <form asp-action="Lock" method="post">
+                        <input type="hidden" asp-for="UserId" />
+                        <input type="hidden" asp-for="UserEmail" />
+
+                        <div class="mb-3">
+                            <label asp-for="Reason" class="form-label"></label>
+                            <textarea asp-for="Reason" class="form-control" rows="3" placeholder="Enter the reason for locking this account..."></textarea>
+                            <span asp-validation-for="Reason" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Duration" class="form-label"></label>
+                            <select asp-for="Duration" class="form-select" id="lockDuration">
+                                <option value="1">1 Hour</option>
+                                <option value="6">6 Hours</option>
+                                <option value="24" selected>1 Day</option>
+                                <option value="72">3 Days</option>
+                                <option value="168">1 Week</option>
+                                <option value="744">1 Month</option>
+                                <option value="-1">Permanent</option>
+                                <option value="0">Custom</option>
+                            </select>
+                            <span asp-validation-for="Duration" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3" id="customHoursDiv" style="display: none;">
+                            <label asp-for="CustomHours" class="form-label"></label>
+                            <input asp-for="CustomHours" class="form-control" type="number" min="1" max="8760" />
+                            <span asp-validation-for="CustomHours" class="text-danger"></span>
+                            <div class="form-text">Enter duration in hours (1-8760)</div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="ViewProfile" asp-route-id="@Model.UserId" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="bi bi-lock-fill me-2"></i>Lock Account
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        document.getElementById('lockDuration').addEventListener('change', function() {
+            var customDiv = document.getElementById('customHoursDiv');
+            if (this.value === '0') {
+                customDiv.style.display = 'block';
+            } else {
+                customDiv.style.display = 'none';
+                document.querySelector('input[name="CustomHours"]').value = '';
+            }
+        });
+    </script>
+}

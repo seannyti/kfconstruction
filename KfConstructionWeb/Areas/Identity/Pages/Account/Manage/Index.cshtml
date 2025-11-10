@@ -1,0 +1,84 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Edit Profile";
+    ViewData["ActivePage"] = ManageNavPages.Index;
+    Layout = "/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12 text-center">
+            <h2>Edit Profile</h2>
+            <p class="text-muted">Manage your account settings and security preferences</p>
+        </div>
+    </div>
+
+    <partial name="_StatusMessage" for="StatusMessage" />
+
+    <!-- Profile Information Card -->
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Profile Information</h5>
+                </div>
+                <div class="card-body">
+                    <form id="profile-form" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                        <div class="form-floating mb-3">
+                            <input asp-for="Username" class="form-control" placeholder="Username" disabled />
+                            <label asp-for="Username" class="form-label"></label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input asp-for="Input.PhoneNumber" class="form-control" placeholder="Phone number"/>
+                            <label asp-for="Input.PhoneNumber" class="form-label"></label>
+                            <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+                        </div>
+                        <button id="update-profile-button" type="submit" class="btn btn-primary">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions Card -->
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Account Management</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="~/Identity/Account/Manage/Email" class="btn btn-outline-primary">
+                            <i class="fas fa-envelope me-2"></i>Change Email
+                        </a>
+                        <a href="~/Identity/Account/Manage/ChangePassword" class="btn btn-outline-primary">
+                            <i class="fas fa-key me-2"></i>Change Password
+                        </a>
+                        <a href="~/Identity/Account/Manage/TwoFactorAuthentication" class="btn btn-outline-success">
+                            <i class="fas fa-shield-alt me-2"></i>Two-Factor Authentication
+                        </a>
+                        <form method="post" asp-page-handler="DeleteAccount" class="d-inline-block w-100" onsubmit="return confirm('Are you absolutely sure you want to delete your account? This action cannot be undone.');">
+                            <button type="submit" class="btn btn-outline-danger w-100">
+                                <i class="fas fa-trash me-2"></i>Delete Account
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back to Home -->
+    <div class="row justify-content-center mt-4">
+        <div class="col-md-10 text-center">
+            <a href="~/" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Home
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,120 @@
+@model KfConstructionWeb.Models.ViewModels.AccountLockHistoryViewModel
+@{
+    ViewData["Title"] = "Lock History";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="display-6">
+                        <i class="bi bi-clock-history me-2"></i>Lock History
+                    </h1>
+                    <p class="text-muted mb-0">Account locks for <strong>@Model.UserEmail</strong></p>
+                </div>
+                <a asp-action="ViewProfile" asp-route-id="@Model.UserId" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>Back to Profile
+                </a>
+            </div>
+
+            @if (!Model.LockHistory.Any())
+            {
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>
+                    This account has never been locked.
+                </div>
+            }
+            else
+            {
+                <div class="card">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Status</th>
+                                        <th>Reason</th>
+                                        <th>Locked At</th>
+                                        <th>Locked Until</th>
+                                        <th>Locked By</th>
+                                        <th>Unlocked At</th>
+                                        <th>Unlocked By</th>
+                                        <th>Unlock Reason</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var lockEntry in Model.LockHistory)
+                                    {
+                                        <tr class="@(lockEntry.IsActive ? "table-warning" : "")">
+                                            <td>
+                                                @if (lockEntry.IsActive)
+                                                {
+                                                    <span class="badge bg-warning text-dark">
+                                                        <i class="bi bi-lock-fill me-1"></i>Active
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-success">
+                                                        <i class="bi bi-unlock-fill me-1"></i>Unlocked
+                                                    </span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <span class="fw-medium">@lockEntry.Reason</span>
+                                            </td>
+                                            <td>
+                                                <small class="text-muted">@lockEntry.LockedAt.ToString("MMM dd, yyyy HH:mm")</small>
+                                            </td>
+                                            <td>
+                                                @if (lockEntry.IsPermanent)
+                                                {
+                                                    <span class="badge bg-danger">Permanent</span>
+                                                }
+                                                else if (lockEntry.LockedUntil.HasValue)
+                                                {
+                                                    <small class="text-muted">@lockEntry.LockedUntil.Value.ToString("MMM dd, yyyy HH:mm")</small>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <small class="text-muted">@lockEntry.LockedBy</small>
+                                            </td>
+                                            <td>
+                                                @if (lockEntry.UnlockedAt.HasValue)
+                                                {
+                                                    <small class="text-muted">@lockEntry.UnlockedAt.Value.ToString("MMM dd, yyyy HH:mm")</small>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <small class="text-muted">@(lockEntry.UnlockedBy ?? "-")</small>
+                                            </td>
+                                            <td>
+                                                <small class="text-muted">@(lockEntry.UnlockReason ?? "-")</small>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Showing @Model.LockHistory.Count lock @(Model.LockHistory.Count == 1 ? "entry" : "entries") for this account.
+                    </small>
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,297 @@
+@model KfConstructionWeb.Models.ViewModels.QuoteRequestModel
+@{
+    ViewData["Title"] = "Request a Quote";
+}
+
+<!-- Hero Section -->
+<div class="quote-hero bg-warning text-dark py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h1 class="display-4 fw-bold mb-3">Request a Free Quote</h1>
+                <p class="lead">Get a detailed estimate for your construction project. We'll respond within 24 hours with a comprehensive proposal tailored to your needs.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container my-5">
+    <!-- Benefits Section -->
+    <div class="row mb-5">
+        <div class="col-lg-10 mx-auto">
+            <div class="row g-4 text-center">
+                <div class="col-md-3 col-sm-6">
+                    <div class="benefit-item p-3">
+                        <i class="bi bi-clock-history text-warning benefit-icon"></i>
+                        <h5 class="mt-3">24-Hour Response</h5>
+                        <p class="text-muted small">Quick turnaround on all quote requests</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="benefit-item p-3">
+                        <i class="bi bi-cash-coin text-warning benefit-icon"></i>
+                        <h5 class="mt-3">No Obligation</h5>
+                        <p class="text-muted small">Free estimates with no commitment</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="benefit-item p-3">
+                        <i class="bi bi-shield-check text-warning benefit-icon"></i>
+                        <h5 class="mt-3">Licensed & Insured</h5>
+                        <p class="text-muted small">Fully certified professionals</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="benefit-item p-3">
+                        <i class="bi bi-graph-up text-warning benefit-icon"></i>
+                        <h5 class="mt-3">Transparent Pricing</h5>
+                        <p class="text-muted small">Detailed breakdown of all costs</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quote Request Form -->
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card border-0 shadow-lg quote-form-card">
+                <div class="card-body p-5">
+                    <h2 class="text-center mb-4">
+                        <i class="bi bi-file-text text-warning me-2"></i>
+                        Tell Us About Your Project
+                    </h2>
+                    
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="bi bi-check-circle me-2"></i>@TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+                    
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+                    
+                    <form asp-action="Quote" method="post" id="quoteForm" class="quote-form">
+                        @Html.AntiForgeryToken()
+                        
+                        <!-- Honeypot field for spam protection (hidden) -->
+                        <div class="honeypot-field" aria-hidden="true">
+                            <input asp-for="HoneyPot" tabindex="-1" autocomplete="off" />
+                        </div>
+
+                        <div class="row g-3">
+                            <!-- Full Name -->
+                            <div class="col-md-6">
+                                <label asp-for="FullName" class="form-label fw-semibold">
+                                    <i class="bi bi-person text-warning me-1"></i>Full Name <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="FullName" class="form-control form-control-lg" placeholder="John Doe" />
+                                <span asp-validation-for="FullName" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Email -->
+                            <div class="col-md-6">
+                                <label asp-for="Email" class="form-label fw-semibold">
+                                    <i class="bi bi-envelope text-warning me-1"></i>Email Address <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Email" type="email" class="form-control form-control-lg" placeholder="john@example.com" />
+                                <span asp-validation-for="Email" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Phone -->
+                            <div class="col-md-6">
+                                <label asp-for="PhoneNumber" class="form-label fw-semibold">
+                                    <i class="bi bi-telephone text-warning me-1"></i>Phone Number <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="PhoneNumber" type="tel" class="form-control form-control-lg" placeholder="(555) 123-4567" />
+                                <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Company -->
+                            <div class="col-md-6">
+                                <label asp-for="Company" class="form-label fw-semibold">
+                                    <i class="bi bi-building text-warning me-1"></i>Company
+                                </label>
+                                <input asp-for="Company" class="form-control form-control-lg" placeholder="Optional" />
+                                <span asp-validation-for="Company" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Services Needed -->
+                            <div class="col-md-6">
+                                <label asp-for="ServicesNeeded" class="form-label fw-semibold">
+                                    <i class="bi bi-tools text-warning me-1"></i>Services Needed <span class="text-danger">*</span>
+                                </label>
+                                <select asp-for="ServicesNeeded" class="form-select form-select-lg">
+                                    <option value="">-- Select a Service --</option>
+                                    <option value="Residential Construction">Residential Construction</option>
+                                    <option value="Commercial Construction">Commercial Construction</option>
+                                    <option value="Renovation & Remodeling">Renovation & Remodeling</option>
+                                    <option value="Project Management">Project Management</option>
+                                    <option value="Design-Build Services">Design-Build Services</option>
+                                    <option value="Maintenance & Repair">Maintenance & Repair</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                                <span asp-validation-for="ServicesNeeded" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Budget -->
+                            <div class="col-md-6">
+                                <label asp-for="Budget" class="form-label fw-semibold">
+                                    <i class="bi bi-currency-dollar text-warning me-1"></i>Budget Range
+                                </label>
+                                <select asp-for="Budget" class="form-select form-select-lg">
+                                    <option value="">-- Select Budget Range --</option>
+                                    <option value="Under $10,000">Under $10,000</option>
+                                    <option value="$10,000 - $25,000">$10,000 - $25,000</option>
+                                    <option value="$25,000 - $50,000">$25,000 - $50,000</option>
+                                    <option value="$50,000 - $100,000">$50,000 - $100,000</option>
+                                    <option value="$100,000 - $250,000">$100,000 - $250,000</option>
+                                    <option value="$250,000 - $500,000">$250,000 - $500,000</option>
+                                    <option value="Over $500,000">Over $500,000</option>
+                                    <option value="Not Sure">Not Sure</option>
+                                </select>
+                                <span asp-validation-for="Budget" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Project Details -->
+                            <div class="col-12">
+                                <label asp-for="ProjectDetails" class="form-label fw-semibold">
+                                    <i class="bi bi-card-text text-warning me-1"></i>Project Details <span class="text-danger">*</span>
+                                </label>
+                                <textarea asp-for="ProjectDetails" class="form-control form-control-lg" rows="6" 
+                                    placeholder="Please describe your project in detail. Include information about location, timeline, specific requirements, and any other relevant details..."></textarea>
+                                <span asp-validation-for="ProjectDetails" class="text-danger small"></span>
+                                <div class="form-text">
+                                    <i class="bi bi-info-circle me-1"></i>The more details you provide, the more accurate your quote will be.
+                                </div>
+                            </div>
+
+                            <!-- Submit Buttons -->
+                            <div class="col-12 mt-4">
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                                    <button type="submit" class="btn btn-warning btn-lg px-5">
+                                        <i class="bi bi-send me-2"></i>Submit Quote Request
+                                    </button>
+                                    <a asp-action="Contact" class="btn btn-outline-secondary btn-lg px-5">
+                                        <i class="bi bi-chat-dots me-2"></i>Contact Us Instead
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="row mt-5">
+        <div class="col-lg-10 mx-auto">
+            <h3 class="text-center mb-4">Frequently Asked Questions</h3>
+            <div class="accordion quote-faq" id="faqAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faq1">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="true" aria-controls="collapse1">
+                            How long does it take to receive a quote?
+                        </button>
+                    </h2>
+                    <div id="collapse1" class="accordion-collapse collapse show" aria-labelledby="faq1" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            We strive to respond to all quote requests within 24 hours during business days. For complex projects, we may schedule a site visit to provide a more accurate estimate.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faq2">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
+                            Is the quote free and without obligation?
+                        </button>
+                    </h2>
+                    <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="faq2" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Yes! All our quotes are completely free with no obligation. We believe in transparent pricing and want you to make an informed decision about your project.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faq3">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3" aria-expanded="false" aria-controls="collapse3">
+                            What information should I include in my project details?
+                        </button>
+                    </h2>
+                    <div id="collapse3" class="accordion-collapse collapse" aria-labelledby="faq3" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Include as much detail as possible: project location, timeline, square footage, materials preferences, special requirements, and any specific challenges. Photos or sketches are also helpful if available.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faq4">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4" aria-expanded="false" aria-controls="collapse4">
+                            Do you offer financing options?
+                        </button>
+                    </h2>
+                    <div id="collapse4" class="accordion-collapse collapse" aria-labelledby="faq4" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Yes, we work with several financing partners to help make your project affordable. We'll discuss financing options when we provide your quote.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faq5">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse5" aria-expanded="false" aria-controls="collapse5">
+                            What areas do you serve?
+                        </button>
+                    </h2>
+                    <div id="collapse5" class="accordion-collapse collapse" aria-labelledby="faq5" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            We primarily serve North Dakota including Bismarck, Fargo, Grand Forks, Minot, and surrounding areas. Contact us to confirm if we service your specific location.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call to Action -->
+    <div class="row mt-5">
+        <div class="col-lg-10 mx-auto">
+            <div class="card quote-cta-card border-0">
+                <div class="card-body p-5 text-center">
+                    <h3 class="mb-3">Need Help Right Away?</h3>
+                    <p class="lead mb-4">Our team is ready to discuss your project and answer any questions you may have.</p>
+                    <div class="d-flex gap-3 justify-content-center flex-wrap">
+                        @if (!string.IsNullOrEmpty(ViewData["CompanyPhone"]?.ToString()))
+                        {
+                            <a href="tel:@ViewData["CompanyPhone"]" class="btn btn-warning btn-lg">
+                                <i class="bi bi-telephone-fill me-2"></i>Call Us Now
+                            </a>
+                        }
+                        @if (!string.IsNullOrEmpty(ViewData["CompanyEmail"]?.ToString()))
+                        {
+                            <a href="mailto:@ViewData["CompanyEmail"]" class="btn btn-outline-light btn-lg">
+                                <i class="bi bi-envelope-fill me-2"></i>Email Us
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/quote.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/quote.js" asp-append-version="true"></script>
+}
