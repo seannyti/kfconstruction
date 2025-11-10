@@ -303,9 +303,14 @@ public class ReceiptsController : BaseAdminController
                 ScheduledPurgeDate = CalculatePurgeDate()
             };
 
+            _logger.LogWarning("=== RECEIPT DATA === Vendor: {Vendor}, Amount: {Amount}, Date: {Date}, Category: {Category}, Payment: {Payment}",
+                receipt.Vendor, receipt.TotalAmount, receipt.PurchaseDate, receipt.Category, receipt.PaymentMethod);
+
             // Validate model
             if (!TryValidateModel(receipt))
             {
+                _logger.LogWarning("=== MODEL VALIDATION FAILED === Errors: {Errors}",
+                    string.Join(", ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)));
                 PopulateReceiptFormData();
                 return View("Upload", model);
             }
