@@ -5,7 +5,7 @@ echo "=== KF Construction Deployment Script ==="
 echo "Starting deployment at $(date)"
 
 # Variables
-SOURCE_DIR="/var/www/myapp-src"
+SOURCE_DIR="/var/www/kfpublish"
 API_PUBLISH_DIR="/var/www/kfpublish/api"
 WEB_PUBLISH_DIR="/var/www/kfpublish/web"
 BACKUP_DIR="/var/backups/kfconstruction"
