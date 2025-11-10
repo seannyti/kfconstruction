@@ -344,8 +344,16 @@
             }
             
             const btn = document.getElementById('submitBtn');
+            const originalText = btn.innerHTML;
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Uploading...';
+            
+            // Safety timeout - re-enable button after 60 seconds if submission hangs
+            setTimeout(function() {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+                showAlert('danger', 'Upload timed out. Please check your connection and try again.', 'timeoutAlert');
+            }, 60000); // 60 seconds
         });
     </script>
 }
