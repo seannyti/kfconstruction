@@ -337,7 +337,12 @@
         }
 
         // Show loading state on submit
-        document.getElementById('uploadForm').addEventListener('submit', function() {
+        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+            // Check if form is valid first
+            if (!this.checkValidity()) {
+                return; // Let HTML5 validation handle it
+            }
+            
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Uploading...';
