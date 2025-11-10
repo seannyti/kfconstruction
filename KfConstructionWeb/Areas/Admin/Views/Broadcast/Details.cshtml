@@ -1,0 +1,243 @@
+@model BroadcastMessage
+
+@{
+    ViewData["Title"] = "Broadcast Message Details";
+    var readRate = Model.RecipientCount > 0 
+        ? (double)Model.ReadCount / Model.RecipientCount * 100 
+        : 0;
+    var isExpired = Model.ExpiresAt.HasValue && Model.ExpiresAt.Value < DateTime.UtcNow;
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2>
+                        <i class="fas fa-info-circle me-2"></i>Message Details
+                    </h2>
+                    <p class="text-muted">View broadcast message information</p>
+                </div>
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="card">
+        <div class="card-header bg-dark text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-bullhorn me-2"></i>@Model.Subject
+                </h5>
+                <div>
+                    @if (isExpired)
+                    {
+                        <span class="badge bg-secondary">Expired</span>
+                    }
+                    else if (Model.IsActive)
+                    {
+                        <span class="badge bg-success">Active</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-dark">Inactive</span>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <!-- Message Content -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h5 class="text-muted">Message</h5>
+                    <div class="alert alert-@(Model.MessageType == "Alert" ? "danger" : Model.MessageType == "Warning" ? "warning" : Model.MessageType == "Info" ? "info" : "primary")">
+                        @Model.Message
+                    </div>
+                </div>
+            </div>
+
+            <!-- Message Details Grid -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h5 class="text-muted mb-3">Details</h5>
+                    <table class="table table-borderless">
+                        <tbody>
+                            <tr>
+                                <th style="width: 40%;">Type:</th>
+                                <td>
+                                    @if (Model.MessageType == "Alert")
+                                    {
+                                        <span class="badge bg-danger">@Model.MessageType</span>
+                                    }
+                                    else if (Model.MessageType == "Warning")
+                                    {
+                                        <span class="badge bg-warning text-dark">@Model.MessageType</span>
+                                    }
+                                    else if (Model.MessageType == "Info")
+                                    {
+                                        <span class="badge bg-info">@Model.MessageType</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-primary">@Model.MessageType</span>
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Target Audience:</th>
+                                <td>
+                                    @if (string.IsNullOrEmpty(Model.TargetRole))
+                                    {
+                                        <span class="badge bg-secondary">All Users</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-dark">@Model.TargetRole</span>
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Delivery Method:</th>
+                                <td>
+                                    @if (Model.SendEmail)
+                                    {
+                                        <i class="fas fa-envelope text-primary me-2" title="Email sent"></i>
+                                        <span>Email</span>
+                                    }
+                                    @if (Model.SendEmail && Model.ShowInApp)
+                                    {
+                                        <span class="mx-2">+</span>
+                                    }
+                                    @if (Model.ShowInApp)
+                                    {
+                                        <i class="fas fa-bell text-info me-2" title="In-app notification"></i>
+                                        <span>In-App</span>
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Sent By:</th>
+                                <td>@Model.SentBy</td>
+                            </tr>
+                            <tr>
+                                <th>Sent At:</th>
+                                <td>@Model.SentAt.ToString("MMMM dd, yyyy 'at' hh:mm tt")</td>
+                            </tr>
+                            @if (Model.ExpiresAt.HasValue)
+                            {
+                                <tr>
+                                    <th>Expires At:</th>
+                                    <td>
+                                        @Model.ExpiresAt.Value.ToString("MMMM dd, yyyy 'at' hh:mm tt")
+                                        @if (isExpired)
+                                        {
+                                            <span class="badge bg-danger ms-2">Expired</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="col-md-6">
+                    <h5 class="text-muted mb-3">Statistics</h5>
+                    <table class="table table-borderless">
+                        <tbody>
+                            <tr>
+                                <th style="width: 40%;">Recipients:</th>
+                                <td>
+                                    <strong class="text-primary">@Model.RecipientCount</strong> users
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Read Count:</th>
+                                <td>
+                                    <strong class="text-success">@Model.ReadCount</strong> users
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Read Rate:</th>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="progress flex-grow-1 me-3" style="height: 20px;">
+                                            <div class="progress-bar @(readRate >= 75 ? "bg-success" : readRate >= 50 ? "bg-info" : readRate >= 25 ? "bg-warning" : "bg-danger")" 
+                                                 role="progressbar" 
+                                                 style="width: @readRate%;" 
+                                                 aria-valuenow="@readRate" 
+                                                 aria-valuemin="0" 
+                                                 aria-valuemax="100">
+                                                @readRate.ToString("F0")%
+                                            </div>
+                                        </div>
+                                        <strong>@readRate.ToString("F1")%</strong>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="row">
+                <div class="col-12">
+                    <hr />
+                    <div class="d-flex gap-2">
+                        @if (Model.IsActive && !isExpired)
+                        {
+                            <button type="button" class="btn btn-warning" 
+                                    onclick="confirmDeactivate(@Model.Id, '@Model.Subject')">
+                                <i class="fas fa-pause me-2"></i>Deactivate Message
+                            </button>
+                        }
+                        <button type="button" class="btn btn-danger" 
+                                onclick="confirmDelete(@Model.Id, '@Model.Subject')">
+                            <i class="fas fa-trash me-2"></i>Delete Message
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary ms-auto">
+                            <i class="bi bi-arrow-left me-2"></i>Back to List
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden Forms -->
+<form id="deactivateForm" asp-action="Deactivate" method="post" style="display: none;">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" value="@Model.Id" />
+</form>
+
+<form id="deleteForm" asp-action="Delete" method="post" style="display: none;">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" value="@Model.Id" />
+</form>
+
+@section Scripts {
+    <script>
+        function confirmDeactivate(id, subject) {
+            if (confirm('Are you sure you want to deactivate the broadcast message "' + subject + '"?\n\nUsers will no longer see this message.')) {
+                document.getElementById('deactivateForm').submit();
+            }
+        }
+
+        function confirmDelete(id, subject) {
+            if (confirm('Are you sure you want to delete the broadcast message "' + subject + '"?\n\nThis action cannot be undone.')) {
+                document.getElementById('deleteForm').submit();
+            }
+        }
+    </script>
+}

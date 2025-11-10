@@ -200,20 +200,18 @@
     </div>
 
     <!-- Call to Action -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <div class="card bg-dark text-white">
-                <div class="card-body p-5 text-center">
-                    <h2 class="h3 fw-bold mb-3">Ready to Start Your Project?</h2>
-                    <p class="lead mb-4">Contact us today for a free consultation and quote</p>
-                    <div class="d-flex justify-content-center gap-3 flex-wrap">
-                        <a asp-controller="Home" asp-action="Contact" class="btn btn-warning btn-lg">
-                            <i class="bi bi-envelope me-2"></i>Get a Free Quote
-                        </a>
-                        <a href="tel:@(ViewData["CompanyPhone"] ?? "")" class="btn btn-outline-light btn-lg">
-                            <i class="bi bi-telephone me-2"></i>Call Us Now
-                        </a>
-                    </div>
+    <div class="text-center mb-5">
+        <div class="card bg-warning bg-opacity-10 border-warning">
+            <div class="card-body p-5">
+                <h2 class="h3 fw-bold mb-3">Ready to Work With Us?</h2>
+                <p class="lead mb-4">Let's discuss your construction project today</p>
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    <a asp-controller="Home" asp-action="Contact" class="btn btn-warning btn-lg">
+                        <i class="bi bi-envelope me-2"></i>Get a Free Quote
+                    </a>
+                    <a asp-controller="Testimonials" asp-action="Index" class="btn btn-outline-warning btn-lg">
+                        <i class="bi bi-chat-heart me-2"></i>Read Testimonials
+                    </a>
                 </div>
             </div>
         </div>

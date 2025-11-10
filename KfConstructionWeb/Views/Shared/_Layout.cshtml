@@ -29,8 +29,8 @@
     <header>
         <nav class="navbar navbar-expand-lg navbar-dark construction-nav">
             <div class="container">
-                <a class="navbar-brand fw-bold" asp-area="" asp-controller="Home" asp-action="Index">
-                    <i class="bi bi-tools me-2"></i>@(ViewData["CompanyName"] ?? "KNUDSON & FAMILY CONSTRUCTION")
+                <a class="navbar-brand fw-bold text-uppercase ls-1" asp-area="" asp-controller="Home" asp-action="Index">
+                    @(ViewData["CompanyName"] ?? "KNUDSON & FAMILY CONSTRUCTION")
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
@@ -40,34 +40,34 @@
                     <ul class="navbar-nav mx-auto align-items-lg-center">
                         <li class="nav-item">
                             <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Services" ? "active" : "")" asp-area="" asp-controller="Home" asp-action="Services">
-                                <i class="bi bi-gear-wide-connected me-1"></i>Services
+                                Services
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "About" ? "active" : "")" asp-area="" asp-controller="Home" asp-action="About">
-                                <i class="bi bi-info-circle me-1"></i>About
+                                About
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Quote" ? "active" : "")" asp-area="" asp-controller="Home" asp-action="Quote">
-                                <i class="bi bi-calculator me-1"></i>Get a Quote
+                                Get a Quote
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Testimonials" ? "active" : "")" asp-area="" asp-controller="Testimonials" asp-action="Index">
-                                <i class="bi bi-chat-heart me-1"></i>Testimonials
+                                Testimonials
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Contact" ? "active" : "")" asp-area="" asp-controller="Home" asp-action="Contact">
-                                <i class="bi bi-envelope me-1"></i>Contact
+                                Contact
                             </a>
                         </li>
                         @if (User.IsInRole("Admin"))
                         {
                             <li class="nav-item">
                                 <a class="nav-link" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
-                                    <i class="bi bi-speedometer2 me-1"></i>Admin
+                                    Admin
                                 </a>
                             </li>
                         }
@@ -80,7 +80,7 @@
                         {
                             <li class="nav-item">
                                 <a class="nav-link" asp-area="Identity" asp-page="/Account/Manage/Index">
-                                    <i class="bi bi-person-circle me-1"></i>Profile
+                                    Profile
                                 </a>
                             </li>
                         }
@@ -103,7 +103,7 @@
                 var displayName = client != null ? $"{client.FirstName} {client.LastName}" : userEmail;
                 
                 <div class="alert alert-info alert-dismissible fade show" role="alert">
-                    <i class="bi bi-person-circle me-2"></i>Hello, <strong>@displayName</strong>!
+                    Hello, <strong>@displayName</strong>!
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             }
@@ -116,27 +116,24 @@
         <div class="container py-4">
             <div class="row">
                 <div class="col-md-6">
-                    <h5 class="text-warning"><i class="bi bi-tools me-2"></i>@(ViewData["CompanyName"] ?? "KF Construction")</h5>
+                    <h5 class="text-warning fw-bold">@(ViewData["CompanyName"] ?? "KF Construction")</h5>
                     <p class="text-light mb-0">@(ViewData["SiteDescription"] ?? "Building Your Dreams, One Project at a Time")</p>
                     <div class="mt-2">
                         @if (!string.IsNullOrEmpty(ViewData["CompanyEmail"]?.ToString()))
                         {
                             <p class="text-light mb-1">
-                                <i class="bi bi-envelope me-2"></i>
                                 <a href="mailto:@ViewData["CompanyEmail"]" class="text-warning text-decoration-none">@ViewData["CompanyEmail"]</a>
                             </p>
                         }
                         @if (!string.IsNullOrEmpty(ViewData["CompanyPhone"]?.ToString()))
                         {
                             <p class="text-light mb-1">
-                                <i class="bi bi-telephone me-2"></i>
                                 <a href="tel:@ViewData["CompanyPhone"]" class="text-warning text-decoration-none">@ViewData["CompanyPhone"]</a>
                             </p>
                         }
                         @if (!string.IsNullOrEmpty(ViewData["CompanyAddress"]?.ToString()))
                         {
                             <p class="text-light mb-0">
-                                <i class="bi bi-geo-alt me-2"></i>
                                 <span class="text-light">@ViewData["CompanyAddress"]</span>
                             </p>
                         }
@@ -167,7 +164,6 @@
             });
         }
     </script>
-    
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
