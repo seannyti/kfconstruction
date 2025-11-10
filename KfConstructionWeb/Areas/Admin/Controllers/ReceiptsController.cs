@@ -169,8 +169,8 @@ public class ReceiptsController : BaseAdminController
         var stopwatch = Stopwatch.StartNew();
         var currentUser = GetCurrentUserId();
 
-        _logger.LogInformation("=== RECEIPT UPLOAD STARTED === User: {User}, HasFile: {HasFile}", 
-            currentUser, receiptFile != null);
+        _logger.LogWarning("=== RECEIPT UPLOAD STARTED === User: {User}, HasFile: {HasFile}, FileSize: {Size}", 
+            currentUser, receiptFile != null, receiptFile?.Length ?? 0);
 
         try
         {
@@ -322,6 +322,9 @@ public class ReceiptsController : BaseAdminController
             _logger.LogInformation(
                 "Receipt uploaded successfully: ID={ReceiptId}, Vendor={Vendor}, Amount={Amount}, OCR={OcrSuccess}, Latency={Latency}ms, User={User}, IP={IpAddress}",
                 receipt.Id, receipt.Vendor, receipt.TotalAmount, ocrResult.Success, stopwatch.ElapsedMilliseconds, currentUser, GetClientIpAddress());
+
+            _logger.LogWarning("=== RECEIPT UPLOAD SUCCESS === ID: {Id}, Vendor: {Vendor}, Amount: {Amount}", 
+                receipt.Id, receipt.Vendor, receipt.TotalAmount);
 
             if (stopwatch.ElapsedMilliseconds > 200)
             {
