@@ -49,20 +49,8 @@ All migrations applied to Azure SQL database:
 
 ## Deploying Updates
 
-### Quick Deploy (Recommended)
-```bash
-ssh root@23.239.26.52
-/usr/local/bin/deploy-kfconstruction.sh
-```
-
-This script automatically:
-1. Backs up current deployment
-2. Pulls latest code from GitHub
-3. Publishes both API and Web apps
-4. Restarts services
-5. Validates services are running
-6. Rolls back on failure
-7. Cleans old backups (keeps last 5)
+### Quick Deploy (Removed)
+Previously, a helper script `/usr/local/bin/deploy-kfconstruction.sh` was used. It has been removed. Use the manual deploy steps below.
 
 ### Manual Deploy Steps
 If you need to deploy manually:
