@@ -163,6 +163,7 @@ public class ReceiptsController : BaseAdminController
     /// </summary>
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [RequestSizeLimit(30 * 1024 * 1024)] // 30MB limit for receipt uploads
     public async Task<IActionResult> Upload(Receipt model, IFormFile receiptFile)
     {
         var stopwatch = Stopwatch.StartNew();
@@ -480,6 +481,7 @@ public class ReceiptsController : BaseAdminController
     /// </summary>
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [RequestSizeLimit(30 * 1024 * 1024)] // 30MB limit for OCR uploads
     public async Task<IActionResult> ProcessOcr(IFormFile file)
     {
         var stopwatch = Stopwatch.StartNew();
