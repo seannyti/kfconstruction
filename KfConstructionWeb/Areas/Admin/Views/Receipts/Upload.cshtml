@@ -35,6 +35,8 @@
                     <div class="alert alert-info">
                         <i class="bi bi-info-circle me-2"></i>
                         <strong>OCR Enabled:</strong> Upload a receipt image and our AI will automatically extract vendor, date, amount, and payment details!
+                        <br>
+                        <small><strong>Note:</strong> Large receipts may take up to 60 seconds to process. Please be patient while OCR analyzes your receipt.</small>
                     </div>
 
                     <form asp-action="Upload" method="post" enctype="multipart/form-data" id="uploadForm">
@@ -54,7 +56,7 @@
                                    required 
                                    onchange="previewFile(this)">
                             <small class="form-text text-muted">
-                                Accepted formats: JPG, PNG, PDF (Max 10MB)
+                                Accepted formats: JPG, PNG, PDF (Max 30MB). Large files may take longer to process.
                             </small>
                         </div>
 

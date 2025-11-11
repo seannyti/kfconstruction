@@ -1,20 +1,42 @@
-@model KfConstructionWeb.Models.BroadcastMessage
-<div class="alert alert-warning alert-dismissible fade show" role="alert">
-    <div class="d-flex align-items-start">
-        <div class="me-2">
-            <i class="bi bi-megaphone-fill fs-4"></i>
+@model KfConstructionWeb.ViewComponents.BroadcastBannerViewModel
+
+@if (Model.HasBroadcast && Model.BroadcastMessage != null)
+{
+    <div class="alert alert-@(Model.BroadcastMessage.MessageType == "Alert" ? "danger" : Model.BroadcastMessage.MessageType == "Warning" ? "warning" : "info") alert-dismissible fade show mb-3" role="alert">
+        <div class="d-flex justify-content-between align-items-start">
+            <div class="flex-grow-1">
+                <div class="mb-2">
+                    <strong>Hello, @Model.UserDisplayName!</strong>
+                </div>
+                <div class="mt-2">
+                    <strong>@Model.BroadcastMessage.Subject</strong>
+                    <span class="text-muted ms-2">- from @Model.BroadcastMessage.SentBy</span>
+                </div>
+                @if (!string.IsNullOrEmpty(Model.BroadcastMessage.Message))
+                {
+                    <div class="mt-2">@Html.Raw(Model.BroadcastMessage.Message)</div>
+                }
+            </div>
+            <button type="button" class="btn-close" aria-label="Close" onclick="dismissMessage(@Model.BroadcastMessage.Id)"></button>
         </div>
-        <div class="flex-grow-1">
-            <h5 class="mb-1">@Model.Subject</h5>
-            <div>@Html.Raw(Model.Message)</div>
-            <small class="text-muted">Sent @Model.SentAt.ToLocalTime().ToString("g")</small>
-        </div>
-        <form asp-area="Admin" asp-controller="Broadcast" asp-action="Dismiss" method="post" class="ms-3">
-            @Html.AntiForgeryToken()
-            <input type="hidden" name="id" value="@Model.Id" />
-            <button type="submit" class="btn btn-sm btn-outline-secondary" title="Dismiss">
-                <i class="bi bi-x-lg"></i>
-            </button>
-        </form>
     </div>
-</div>
+
+    <form id="dismissForm_@Model.BroadcastMessage.Id" asp-controller="Messages" asp-action="Dismiss" method="post" style="display: none;">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="@Model.BroadcastMessage.Id" />
+        <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+    </form>
+
+    <script>
+        function dismissMessage(id) {
+            document.getElementById('dismissForm_' + id).submit();
+        }
+    </script>
+}
+else
+{
+    <div class="alert alert-info alert-dismissible fade show mb-3" role="alert">
+        Hello, <strong>@Model.UserDisplayName</strong>!
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}

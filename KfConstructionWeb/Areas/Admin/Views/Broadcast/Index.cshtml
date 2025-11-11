@@ -6,41 +6,23 @@
 
 <div class="container-fluid">
     <div class="row mb-4">
+        <div class="col-12 mb-3 mb-md-0">
+            <h2>
+                <i class="fas fa-bullhorn me-2"></i>Broadcast Messaging
+            </h2>
+            <p class="text-muted">Send announcements to users</p>
+        </div>
         <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h2>
-                        <i class="fas fa-bullhorn me-2"></i>Broadcast Messaging
-                    </h2>
-                    <p class="text-muted">Send announcements to users</p>
-                </div>
-                <div class="d-flex gap-2">
-                    <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary">
-                        <i class="bi bi-arrow-left"></i> Dashboard
-                    </a>
-                    <a asp-action="Create" class="btn btn-primary">
-                        <i class="bi bi-plus-circle"></i> New Broadcast
-                    </a>
-                </div>
+            <div class="d-flex flex-wrap gap-2">
+                <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i><span class="d-none d-sm-inline">Dashboard</span>
+                </a>
+                <a asp-action="Create" class="btn btn-primary btn-sm">
+                    <i class="bi bi-plus-circle me-1"></i><span class="d-none d-sm-inline">New</span> Broadcast
+                </a>
             </div>
         </div>
     </div>
-
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    }
-
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="fas fa-exclamation-triangle me-2"></i>@TempData["Error"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    }
 
     <!-- Statistics Cards -->
     <div class="row mb-4">

@@ -12,6 +12,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
     serverOptions.Limits.MaxRequestBodySize = 30 * 1024 * 1024; // 30MB
+    serverOptions.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(5); // Keep connection alive during OCR
+    serverOptions.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(5); // Allow time for large uploads
 });
 
 // Add services to the container.

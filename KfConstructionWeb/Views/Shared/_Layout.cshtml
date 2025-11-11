@@ -72,11 +72,6 @@
                                 </a>
                             </li>
                         }
-                        @* Broadcast bell for authenticated users *@
-                        @if (User.Identity?.IsAuthenticated == true)
-                        {
-                            @await Component.InvokeAsync("BroadcastBell")
-                        }
                         @if (User.IsInRole("User") && !User.IsInRole("Admin"))
                         {
                             <li class="nav-item">
@@ -96,17 +91,6 @@
             @if (User.Identity?.IsAuthenticated == true)
             {
                 @await Component.InvokeAsync("BroadcastBanner")
-            }
-            @if (User.Identity?.IsAuthenticated == true)
-            {
-                var userEmail = User.Identity.Name;
-                var client = await DbContext.Clients.FirstOrDefaultAsync(c => c.Email == userEmail);
-                var displayName = client != null ? $"{client.FirstName} {client.LastName}" : userEmail;
-                
-                <div class="alert alert-info alert-dismissible fade show" role="alert">
-                    Hello, <strong>@displayName</strong>!
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
             }
             <partial name="_TempDataMessages" />
             @RenderBody()

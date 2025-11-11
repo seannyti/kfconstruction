@@ -231,6 +231,71 @@
                                 }
                             </small>
                         </div>
+                        
+                        <!-- Password Reset (SuperAdmin Only) -->
+                        <div class="mb-4">
+                            <h6 class="text-success"><i class="bi bi-key me-2"></i>Password Management</h6>
+                            <div class="card border-success">
+                                <div class="card-body">
+                                    <form asp-action="ResetPassword" method="post" id="resetPasswordForm" onsubmit="return confirmPasswordReset();">
+                                        <input type="hidden" name="userId" value="@Model.Id" />
+                                        
+                                        <input type="hidden" id="userEmail" value="@Model.Email" />
+                                        
+                                        <div class="mb-3">
+                                            <label for="newPassword" class="form-label">
+                                                <i class="bi bi-lock-fill me-1"></i>New Password
+                                            </label>
+                                            <input type="password" 
+                                                   class="form-control" 
+                                                   id="newPassword" 
+                                                   name="newPassword" 
+                                                   required 
+                                                   minlength="6"
+                                                   placeholder="Enter new password (min. 6 characters)">
+                                            <small class="form-text text-muted">
+                                                Password must be at least 6 characters long.
+                                            </small>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="confirmPassword" class="form-label">
+                                                <i class="bi bi-lock-fill me-1"></i>Confirm Password
+                                            </label>
+                                            <input type="password" 
+                                                   class="form-control" 
+                                                   id="confirmPassword" 
+                                                   required 
+                                                   minlength="6"
+                                                   placeholder="Re-enter password to confirm">
+                                        </div>
+
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" 
+                                                   type="checkbox" 
+                                                   id="forcePasswordChange" 
+                                                   name="forcePasswordChange" 
+                                                   value="true">
+                                            <label class="form-check-label" for="forcePasswordChange">
+                                                <i class="bi bi-exclamation-triangle-fill text-warning me-1"></i>
+                                                Force password change on next login
+                                            </label>
+                                            <small class="form-text text-muted d-block">
+                                                User will be required to change this password when they log in. Their current session will be terminated.
+                                            </small>
+                                        </div>
+
+                                        <button type="submit" class="btn btn-success">
+                                            <i class="bi bi-key-fill me-2"></i>Reset Password
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            <small class="text-muted d-block mt-2">
+                                <i class="bi bi-shield-check me-1"></i>
+                                Use this to set a temporary password or reset access for locked-out users.
+                            </small>
+                        </div>
                     }
 
                     <!-- Danger Zone -->
@@ -269,34 +334,5 @@
 </div>
 
 @section Scripts {
-    <script>
-        // Enhanced delete confirmation
-        function confirmUserDeletion(userEmail) {
-            const confirmText = `DELETE ${userEmail}`;
-            const userInput = prompt(
-                `This will permanently delete the user account for "${userEmail}" and all associated data.\n\n` +
-                `This action cannot be undone!\n\n` +
-                `To confirm, type exactly: ${confirmText}`
-            );
-            
-            if (userInput === confirmText) {
-                return confirm(`Are you absolutely sure you want to delete "${userEmail}"? This is your final confirmation.`);
-            } else if (userInput !== null) {
-                alert('Confirmation text did not match. User deletion cancelled.');
-            }
-            
-            return false;
-        }
-
-        // Add visual feedback for action buttons
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add tooltips to buttons
-            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl);
-            });
-
-            console.log('User Profile View Loaded for:', '@Model.Email');
-        });
-    </script>
+    <script src="~/js/admin.users.js" asp-append-version="true"></script>
 }

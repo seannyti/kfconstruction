@@ -443,4 +443,65 @@ public class UsersController : Controller
 
         return View(model);
     }
+
+    // POST: Admin/Users/ResetPassword
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize(Roles = "SuperAdmin")]
+    public async Task<IActionResult> ResetPassword(string userId, string newPassword, bool forcePasswordChange = false)
+    {
+        if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(newPassword))
+        {
+            TempData["Error"] = "User ID and new password are required.";
+            return RedirectToAction(nameof(ViewProfile), new { id = userId });
+        }
+
+        var user = await GetValidatedUser(userId);
+        if (user == null)
+            return ErrorRedirect("User not found.");
+
+        // Prevent resetting SuperAdmin passwords (additional safety)
+        var roles = await _userManager.GetRolesAsync(user);
+        if (roles.Contains("SuperAdmin"))
+        {
+            TempData["Error"] = "Cannot reset password for SuperAdmin accounts.";
+            return RedirectToAction(nameof(ViewProfile), new { id = userId });
+        }
+
+        try
+        {
+            // Generate password reset token and reset password
+            var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, resetToken, newPassword);
+
+            if (result.Succeeded)
+            {
+                // If force password change is enabled, update security stamp to invalidate existing sessions
+                if (forcePasswordChange)
+                {
+                    await _userManager.UpdateSecurityStampAsync(user);
+                    _logger.LogInformation($"Password reset for user {user.Email} with forced password change on next login by {User.Identity?.Name}");
+                    TempData["Success"] = $"Password reset successfully. User will be required to change password on next login.";
+                }
+                else
+                {
+                    _logger.LogInformation($"Password reset for user {user.Email} by {User.Identity?.Name}");
+                    TempData["Success"] = "Password reset successfully.";
+                }
+            }
+            else
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                _logger.LogWarning($"Failed to reset password for user {user.Email}: {errors}");
+                TempData["Error"] = $"Failed to reset password: {errors}";
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Error resetting password for user {userId}");
+            TempData["Error"] = "An error occurred while resetting the password. Please try again.";
+        }
+
+        return RedirectToAction(nameof(ViewProfile), new { id = userId });
+    }
 }
