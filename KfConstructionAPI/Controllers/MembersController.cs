@@ -192,6 +192,44 @@ public class MembersController : ControllerBase
     }
 
     /// <summary>
+    /// Retrieves a member by their associated user ID
+    /// </summary>
+    /// <param name="userId">The Identity user ID associated with the member</param>
+    /// <returns>A standardized API response containing the requested member</returns>
+    /// <response code="200">Returns the member successfully</response>
+    /// <response code="404">If the member is not found</response>
+    /// <response code="500">If an error occurred retrieving the member</response>
+    [HttpGet("user/{userId}")]
+    [ProducesResponseType(typeof(APIResponse), 200)]
+    [ProducesResponseType(typeof(APIResponse), 404)]
+    [ProducesResponseType(typeof(APIResponse), 500)]
+    public ActionResult<APIResponse> GetMemberByUserId(string userId)
+    {
+        try
+        {
+            _logger.LogInformation("Retrieving member with User ID: {UserId}", userId);
+            var member = _memberService.GetMemberByUserId(userId);
+            if (member == null)
+            {
+                _logger.LogWarning("Member with User ID {UserId} not found", userId);
+                var errorResponse = CreateErrorResponse($"Member with user ID {userId} not found.", HttpStatusCode.NotFound);
+                return StatusCode((int)errorResponse.StatusCode, errorResponse);
+            }
+
+            var dto = MapToDto(member);
+            var response = CreateSuccessResponse(dto);
+            _logger.LogInformation("Member with User ID {UserId} retrieved successfully", userId);
+            return StatusCode((int)response.StatusCode, response);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving member with User ID: {UserId}", userId);
+            var response = CreateErrorResponse("Error retrieving member. Please try again later.");
+            return StatusCode((int)response.StatusCode, response);
+        }
+    }
+
+    /// <summary>
     /// Creates a new member in the system
     /// </summary>
     /// <param name="dto">The member data transfer object containing member details</param>

@@ -21,6 +21,13 @@ public interface IMemberService
     Member? GetMemberById(int id);
 
     /// <summary>
+    /// Retrieves a member by their associated Identity user ID
+    /// </summary>
+    /// <param name="userId">The Identity user ID associated with the member</param>
+    /// <returns>The member if found, null otherwise</returns>
+    Member? GetMemberByUserId(string userId);
+
+    /// <summary>
     /// Adds a new member to the database
     /// </summary>
     /// <param name="member">The member to add</param>

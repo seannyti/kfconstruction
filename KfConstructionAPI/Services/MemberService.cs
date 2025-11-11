@@ -74,6 +74,34 @@ public class MemberService : IMemberService
     }
 
     /// <summary>
+    /// Retrieves a member by their associated Identity user ID
+    /// </summary>
+    /// <param name="userId">The Identity user ID associated with the member</param>
+    /// <returns>The member if found, null otherwise</returns>
+    public Member? GetMemberByUserId(string userId)
+    {
+        try
+        {
+            _logger.LogInformation("Retrieving member with User ID: {UserId}", userId);
+            var member = _context.Members.FirstOrDefault(m => m.UserId == userId);
+            if (member != null)
+            {
+                _logger.LogInformation("Member with User ID {UserId} found: {MemberName}", userId, member.Name);
+            }
+            else
+            {
+                _logger.LogWarning("Member with User ID {UserId} not found", userId);
+            }
+            return member;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while retrieving member with User ID: {UserId}", userId);
+            throw;
+        }
+    }
+
+    /// <summary>
     /// Adds a new member to the database
     /// </summary>
     /// <param name="member">The member to add</param>

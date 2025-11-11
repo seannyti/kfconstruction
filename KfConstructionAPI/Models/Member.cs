@@ -21,6 +21,11 @@ public class Member
     public string Email { get; set; } = string.Empty;
 
     /// <summary>
+    /// The associated ASP.NET Identity user ID
+    /// </summary>
+    public string? UserId { get; set; }
+
+    /// <summary>
     /// The date and time when the member was created (defaults to UTC now)
     /// </summary>
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
