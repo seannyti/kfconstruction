@@ -286,11 +286,20 @@ public class UsersController : Controller
         // Get member data from API
         var memberData = await _userDeletionService.GetMemberByUserIdAsync(id);
 
-        // Get client data for full name
+        // Get client data for full name, fallback to member name
         var client = await _dbContext.Clients
             .AsNoTracking()
             .FirstOrDefaultAsync(c => c.Email == user.Email);
-        var fullName = client != null ? $"{client.FirstName} {client.LastName}".Trim() : null;
+        
+        string? fullName = null;
+        if (client != null && !string.IsNullOrWhiteSpace(client.FirstName))
+        {
+            fullName = $"{client.FirstName} {client.LastName}".Trim();
+        }
+        else if (memberData != null && !string.IsNullOrWhiteSpace(memberData.Name))
+        {
+            fullName = memberData.Name;
+        }
 
         // Get current lock status
         var currentLock = await _accountLockService.GetActiveLockAsync(id);

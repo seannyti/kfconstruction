@@ -81,9 +81,22 @@ namespace KfConstructionWeb.Areas.Identity.Pages.Account.Manage
 
             Username = userName;
 
-            // Get full name from Client table
-            var client = await _dbContext.Clients.FirstOrDefaultAsync(c => c.Email == userName);
-            FullName = client != null ? $"{client.FirstName} {client.LastName}".Trim() : null;
+            // Get full name from Client table first
+            var client = await _dbContext.Clients
+                .AsNoTracking()
+                .FirstOrDefaultAsync(c => c.Email == userName);
+            
+            if (client != null && !string.IsNullOrWhiteSpace(client.FirstName))
+            {
+                FullName = $"{client.FirstName} {client.LastName}".Trim();
+            }
+            else
+            {
+                // Try getting from Member table via API
+                var userId = await _userManager.GetUserIdAsync(user);
+                var member = await _userDeletionService.GetMemberByUserIdAsync(userId);
+                FullName = member?.Name;
+            }
 
             Input = new InputModel
             {
