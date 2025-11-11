@@ -22,6 +22,11 @@ public abstract class BaseMemberDto
     public string Email { get; set; } = string.Empty;
 
     /// <summary>
+    /// The associated ASP.NET Identity user ID
+    /// </summary>
+    public string? UserId { get; set; }
+
+    /// <summary>
     /// Indicates whether the member is currently active in the system
     /// </summary>
     public bool IsActive { get; set; } = true;

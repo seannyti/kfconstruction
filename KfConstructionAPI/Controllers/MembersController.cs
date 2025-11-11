@@ -257,6 +257,7 @@ public class MembersController : ControllerBase
             {
                 Name = dto.Name,
                 Email = dto.Email,
+                UserId = dto.UserId,
                 IsActive = dto.IsActive,
                 CreatedAt = DateTime.UtcNow
             };
