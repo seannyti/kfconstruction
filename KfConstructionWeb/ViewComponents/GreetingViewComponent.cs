@@ -1,5 +1,4 @@
 using KfConstructionWeb.Data;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,31 +15,32 @@ public class GreetingViewComponent : ViewComponent
 
     public async Task<IViewComponentResult> InvokeAsync()
     {
-        if (!User.Identity?.IsAuthenticated ?? true)
+        // Return empty if not authenticated
+        if (User?.Identity?.IsAuthenticated != true)
         {
             return Content(string.Empty);
         }
 
         // Get user's display name from Client table
-        var userEmail = User.Identity?.Name;
-        var client = userEmail != null 
-            ? await _dbContext.Clients.FirstOrDefaultAsync(c => c.Email == userEmail) 
-            : null;
+        var userEmail = User.Identity.Name;
+        if (string.IsNullOrEmpty(userEmail))
+        {
+            return Content(string.Empty);
+        }
+
+        var client = await _dbContext.Clients
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.Email == userEmail);
         
         // Use client's first and last name if available, otherwise use email
         string displayName;
-        if (client != null)
+        if (client != null && !string.IsNullOrWhiteSpace(client.FirstName))
         {
             displayName = $"{client.FirstName} {client.LastName}".Trim();
-            // Fallback to email if names are empty
-            if (string.IsNullOrWhiteSpace(displayName))
-            {
-                displayName = userEmail ?? "User";
-            }
         }
         else
         {
-            displayName = userEmail ?? "User";
+            displayName = userEmail;
         }
 
         return View("Default", displayName);

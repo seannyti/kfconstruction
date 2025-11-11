@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using KfConstructionWeb.Services.Interfaces;
+using KfConstructionWeb.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace KfConstructionWeb.Areas.Identity.Pages.Account.Manage
 {
@@ -18,15 +20,18 @@ namespace KfConstructionWeb.Areas.Identity.Pages.Account.Manage
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly IUserDeletionService _userDeletionService;
+        private readonly ApplicationDbContext _dbContext;
 
         public IndexModel(
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
-            IUserDeletionService userDeletionService)
+            IUserDeletionService userDeletionService,
+            ApplicationDbContext dbContext)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _userDeletionService = userDeletionService;
+            _dbContext = dbContext;
         }
 
         /// <summary>
@@ -34,6 +39,11 @@ namespace KfConstructionWeb.Areas.Identity.Pages.Account.Manage
         ///     directly from your code. This API may change or be removed in future releases.
         /// </summary>
         public string Username { get; set; }
+
+        /// <summary>
+        /// Full name of the user from the Client table
+        /// </summary>
+        public string FullName { get; set; }
 
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -70,6 +80,10 @@ namespace KfConstructionWeb.Areas.Identity.Pages.Account.Manage
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
 
             Username = userName;
+
+            // Get full name from Client table
+            var client = await _dbContext.Clients.FirstOrDefaultAsync(c => c.Email == userName);
+            FullName = client != null ? $"{client.FirstName} {client.LastName}".Trim() : null;
 
             Input = new InputModel
             {
