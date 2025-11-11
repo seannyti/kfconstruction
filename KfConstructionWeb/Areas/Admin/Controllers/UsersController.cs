@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using KfConstructionWeb.Models;
 using KfConstructionWeb.Models.ViewModels;
 using KfConstructionWeb.Services.Interfaces;
+using KfConstructionWeb.Data;
 using System.Text.Json;
 
 namespace KfConstructionWeb.Areas.Admin.Controllers;
@@ -18,6 +19,7 @@ public class UsersController : Controller
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IUserDeletionService _userDeletionService;
     private readonly IAccountLockService _accountLockService;
+    private readonly ApplicationDbContext _dbContext;
     private readonly ILogger<UsersController> _logger;
 
     public UsersController(
@@ -26,6 +28,7 @@ public class UsersController : Controller
         IHttpClientFactory httpClientFactory,
         IUserDeletionService userDeletionService,
         IAccountLockService accountLockService,
+        ApplicationDbContext dbContext,
         ILogger<UsersController> logger)
     {
         _userManager = userManager;
@@ -33,6 +36,7 @@ public class UsersController : Controller
         _httpClientFactory = httpClientFactory;
         _userDeletionService = userDeletionService;
         _accountLockService = accountLockService;
+        _dbContext = dbContext;
         _logger = logger;
     }
 
@@ -282,6 +286,12 @@ public class UsersController : Controller
         // Get member data from API
         var memberData = await _userDeletionService.GetMemberByUserIdAsync(id);
 
+        // Get client data for full name
+        var client = await _dbContext.Clients
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.Email == user.Email);
+        var fullName = client != null ? $"{client.FirstName} {client.LastName}".Trim() : null;
+
         // Get current lock status
         var currentLock = await _accountLockService.GetActiveLockAsync(id);
         var isCurrentlyLocked = currentLock != null && currentLock.IsCurrentlyLocked;
@@ -296,6 +306,7 @@ public class UsersController : Controller
             Id = user.Id,
             Email = user.Email!,
             UserName = user.UserName!,
+            FullName = fullName,
             IsAdmin = isAdmin,
             IsSuperAdmin = isSuperAdmin,
             MemberData = memberData,
