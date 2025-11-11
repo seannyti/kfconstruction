@@ -20,8 +20,6 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<ReceiptAccessLog> ReceiptAccessLogs { get; set; }
     public DbSet<UploadedFile> UploadedFiles { get; set; }
     public DbSet<ActivityLog> ActivityLogs { get; set; }
-    public DbSet<BroadcastMessage> BroadcastMessages { get; set; }
-    public DbSet<UserMessageStatus> UserMessageStatuses { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -122,29 +120,5 @@ public class ApplicationDbContext : IdentityDbContext
         modelBuilder.Entity<ReceiptAccessLog>()
             .HasIndex(ral => new { ral.AccessedBy, ral.AccessedAt })
             .HasDatabaseName("IX_ReceiptAccessLogs_AccessedBy_AccessedAt");
-
-        // Configure BroadcastMessage relationships
-        modelBuilder.Entity<UserMessageStatus>()
-            .HasOne(ums => ums.BroadcastMessage)
-            .WithMany(bm => bm.UserStatuses)
-            .HasForeignKey(ums => ums.BroadcastMessageId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        // Configure BroadcastMessage indexes
-        modelBuilder.Entity<BroadcastMessage>()
-            .HasIndex(bm => new { bm.IsActive, bm.SentAt })
-            .HasDatabaseName("IX_BroadcastMessages_Active_SentAt");
-
-        modelBuilder.Entity<BroadcastMessage>()
-            .HasIndex(bm => bm.TargetRole)
-            .HasDatabaseName("IX_BroadcastMessages_TargetRole");
-
-        modelBuilder.Entity<UserMessageStatus>()
-            .HasIndex(ums => new { ums.UserId, ums.IsRead })
-            .HasDatabaseName("IX_UserMessageStatuses_UserId_IsRead");
-
-        modelBuilder.Entity<UserMessageStatus>()
-            .HasIndex(ums => new { ums.BroadcastMessageId, ums.IsRead })
-            .HasDatabaseName("IX_UserMessageStatuses_MessageId_IsRead");
     }
 }

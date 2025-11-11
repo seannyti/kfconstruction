@@ -94,12 +94,6 @@ builder.Services.AddScoped<IFileManagementService, FileManagementService>();
 // Register Activity Log Service
 builder.Services.AddScoped<IActivityLogService, ActivityLogService>();
 
-// Register Backup/Restore Service
-builder.Services.AddScoped<IBackupRestoreService, BackupRestoreService>();
-
-// Register Broadcast Message Service
-builder.Services.AddScoped<IBroadcastMessageService, BroadcastMessageService>();
-
 // Register Scheduled Task Registry (for dashboard)
 builder.Services.AddSingleton<IScheduledTaskRegistry, ScheduledTaskRegistry>();
 

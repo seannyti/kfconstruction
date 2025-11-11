@@ -90,7 +90,7 @@
         <main role="main" class="py-4">
             @if (User.Identity?.IsAuthenticated == true)
             {
-                @await Component.InvokeAsync("BroadcastBanner")
+                @await Component.InvokeAsync("Greeting")
             }
             <partial name="_TempDataMessages" />
             @RenderBody()
